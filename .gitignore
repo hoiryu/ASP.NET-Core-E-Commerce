@@ -1,0 +1,86 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+.vs/
+*.nupkg
+*.snupkg
+*.lock.json
+!packages.lock.json
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+.nuget/
+packages/
+*.nuspec
+
+# Publish
+publish/
+PublishProfiles/
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Entity Framework migrations (optional - remove if you want to track)
+# Migrations/
+
+# Docker
+.env
+.env.*
+!.env.example
+
+# Database files
+database
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Secrets / environment
+appsettings.Development.json
+appsettings.Local.json
+secrets.json

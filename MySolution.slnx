@@ -1,0 +1,4 @@
+<Solution>
+	<Project Path="MyFirstApp.Api/MyFirstApp.Api.csproj" />
+	<Project Path="MyMiddleware.Api/MyMiddleware.Api.csproj" />
+</Solution>
