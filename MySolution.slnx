@@ -1,4 +1,6 @@
 <Solution>
 	<Project Path="MyFirstApp.Api/MyFirstApp.Api.csproj" />
 	<Project Path="MyMiddleware.Api/MyMiddleware.Api.csproj" />
+	<Project Path="Routing.Api/Routing.Api.csproj" />
+	<Project Path="UseWhen.Api/UseWhen.Api.csproj" />
 </Solution>
