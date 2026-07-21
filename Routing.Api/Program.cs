@@ -1,4 +1,12 @@
+using Routing.Api.CustomConstrains;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRouting(options =>
+{
+	options.ConstraintMap.Add("months", typeof(MonthsCustomConstrain));
+});
+
 var app = builder.Build();
 
 app.MapGet("/products/{id=1}", async (HttpContext context, int id) => Results.Ok(new { message = $"ProductId: {id}" }));
@@ -15,6 +23,11 @@ app.MapGet(
 		reportdate is null
 			? Results.Ok(new { message = $"Now: {DateTime.Now}" })
 			: Results.Ok(new { message = $"reportdate: {reportdate}" })
+);
+
+app.MapGet(
+	"/sales-report/{year:int:min(1900)}/{month:months}",
+	(HttpContext context, int year, string month) => Results.Ok(new { message = $"year: {year}, month: {month}" })
 );
 
 app.MapFallback(
