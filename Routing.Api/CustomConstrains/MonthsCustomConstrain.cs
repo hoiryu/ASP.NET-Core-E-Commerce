@@ -4,7 +4,7 @@ namespace Routing.Api.CustomConstrains;
 
 public partial class MonthsCustomConstrain : IRouteConstraint
 {
-	[GeneratedRegex("^(apr|jul|oct|jan)$")]
+	[GeneratedRegex("^(jan|apr|jul|oct)$")]
 	private static partial Regex MonthRegex();
 
 	public bool Match(
