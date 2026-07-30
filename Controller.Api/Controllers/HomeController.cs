@@ -27,5 +27,11 @@ namespace Controller.Api.Controllers
 
 			return person;
 		}
+
+		[HttpGet("file-download")]
+		public IActionResult GetFileDownload()
+		{
+			return File("pdfs/sample.pdf", "application/pdf", "test.pdf");
+		}
 	}
 }
