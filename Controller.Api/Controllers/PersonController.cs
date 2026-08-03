@@ -7,15 +7,15 @@ namespace Controller.Api.Controllers
 	[ApiController]
 	public class PersonController : ControllerBase
 	{
-		[HttpGet]
-		public IActionResult Get()
+		[HttpPost("register")]
+		public ActionResult<Person> CreatePerson([FromForm] Person person)
 		{
-			var controllerName = ControllerContext.RouteData.Values["controller"];
-			return Ok(new { message = $"controller name: {controllerName}" });
+			person.Id = Guid.NewGuid();
+			return person;
 		}
 
-		[HttpGet("{personId:int}")]
-		public ActionResult<Person> GetPerson([FromRoute] int personId, [FromQuery] string? name, [FromQuery] int? age)
+		[HttpGet()]
+		public ActionResult<Person> GetPerson([FromQuery] string? name, [FromQuery] int? age)
 		{
 			if (string.IsNullOrEmpty(name))
 			{
@@ -30,8 +30,11 @@ namespace Controller.Api.Controllers
 			Person person = new()
 			{
 				Id = Guid.NewGuid(),
-				PersonId = personId,
 				Name = name,
+				Email = "test@mail.com",
+				Phone = "01011112222",
+				Password = "1q2w3e4r",
+				ConfirmPassword = "1q2w3e4r",
 				Age = age,
 			};
 
