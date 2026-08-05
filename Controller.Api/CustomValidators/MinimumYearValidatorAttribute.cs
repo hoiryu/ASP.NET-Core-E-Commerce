@@ -26,12 +26,8 @@ public class MinimumYearValidatorAttribute : ValidationAttribute
 		DateTime date = (DateTime)value;
 
 		if (date.Year >= MinimumYear)
-		{
 			return new ValidationResult(FormatErrorMessage(validationContext.DisplayName));
-		}
 		else
-		{
 			return ValidationResult.Success;
-		}
 	}
 }

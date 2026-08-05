@@ -1,4 +1,4 @@
-namespace Controller.Api.Controllers.Models;
+namespace Controller.Api.Models;
 
 public class Book
 {

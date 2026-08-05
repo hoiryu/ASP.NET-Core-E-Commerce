@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using Controller.Api.CustomValidators;
 
-namespace Controller.Api.Controllers.Models;
+namespace Controller.Api.Models;
 
-public class Person
+public class Person : IValidatableObject
 {
 	[Required]
 	public Guid Id { get; set; }
@@ -33,7 +33,23 @@ public class Person
 	public int? Age { get; set; }
 
 	// [MinimumYearValidatorAttribute(2000, ErrorMessage = "{0} should not be newer than Jan 01, {1}")]
-	[MinimumYearValidatorAttribute(2000)]
+	[MinimumYearValidator(2000)]
 	[Display(Name = "Date of birth")]
 	public DateTime? DateOfBirth { get; set; }
+
+	[Display(Name = "Form Date")]
+	public DateTime? FromDate { get; set; }
+
+	[DateRangeValidator("FromDate", ErrorMessage = "{0} must be after {1}")]
+	[Display(Name = "To Date")]
+	public DateTime? ToDate { get; set; }
+
+	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+	{
+		if (DateOfBirth.HasValue == false && Age.HasValue == false)
+		{
+			yield return new ValidationResult("Either of Date of birth or Age must be supplied", [nameof(DateOfBirth)]);
+			yield return new ValidationResult("Either of Date of birth or Age must be supplied", [nameof(Age)]);
+		}
+	}
 }

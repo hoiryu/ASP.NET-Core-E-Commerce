@@ -1,4 +1,4 @@
-using Controller.Api.Controllers.Models;
+using Controller.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Controller.Api.Controllers
@@ -15,16 +15,28 @@ namespace Controller.Api.Controllers
 		}
 
 		[HttpGet()]
-		public ActionResult<Person> GetPerson([FromQuery] string? name, [FromQuery] int? age)
+		public ActionResult<Person> GetPerson()
+		{
+			Person person = new()
+			{
+				Id = Guid.NewGuid(),
+				Name = "김아무개",
+				Email = "test@mail.com",
+				Phone = "01011112222",
+				Password = "1q2w3e4r",
+				ConfirmPassword = "1q2w3e4r",
+				Age = 20,
+			};
+
+			return person;
+		}
+
+		[HttpGet(":name")]
+		public ActionResult<Person> GetPersonByName([FromRoute] string? name)
 		{
 			if (string.IsNullOrEmpty(name))
 			{
 				return BadRequest("Name is not supplied or empty");
-			}
-
-			if (age is null || age <= 0)
-			{
-				return BadRequest("Age can't be less than or equal to 0");
 			}
 
 			Person person = new()
@@ -35,7 +47,7 @@ namespace Controller.Api.Controllers
 				Phone = "01011112222",
 				Password = "1q2w3e4r",
 				ConfirmPassword = "1q2w3e4r",
-				Age = age,
+				Age = 20,
 			};
 
 			return person;
