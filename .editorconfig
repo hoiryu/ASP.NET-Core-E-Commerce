@@ -10,6 +10,7 @@ trim_trailing_whitespace = true
 indent_style = tab
 indent_size = 4
 dotnet_diagnostic.IDE0005.severity = warning
+dotnet_style_namespace_match_folder = true:warning
 
 [*.{json,yaml,yml}]
 indent_style = tab

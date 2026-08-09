@@ -1,10 +1,14 @@
 using System.Text.Json;
+using Controller.Api.CustomModelBinders;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder
-	.Services.AddControllers()
+	.Services.AddControllers(options =>
+	{
+		options.ModelBinderProviders.Insert(0, new PersonModelBinderProvider());
+	})
 	.AddJsonOptions(options =>
 	{
 		options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
