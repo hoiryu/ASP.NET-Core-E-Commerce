@@ -1,7 +1,5 @@
 <Solution>
 	<Project Path="Controller.Api/Controller.Api.csproj" />
-	<Project Path="MyFirstApp.Api/MyFirstApp.Api.csproj" />
-	<Project Path="MyMiddleware.Api/MyMiddleware.Api.csproj" />
-	<Project Path="Routing.Api/Routing.Api.csproj" />
-	<Project Path="UseWhen.Api/UseWhen.Api.csproj" />
+	<Project Path="DependencyInjection.Api/DependencyInjection.Api.csproj" />
+	<Project Path="Services/Services.csproj" />
 </Solution>
