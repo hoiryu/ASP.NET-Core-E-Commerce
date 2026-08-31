@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using Services;
+using ServiceContracts;
 
 namespace DependencyInjection.Api.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class CitiesController(CitiesService citiesService) : ControllerBase
+	public class CitiesController(ICitiesService citiesService) : ControllerBase
 	{
-		private readonly CitiesService _citiesService = citiesService;
+		private readonly ICitiesService _citiesService = citiesService;
 
 		[HttpGet()]
 		public ActionResult<List<string>> GetCities()

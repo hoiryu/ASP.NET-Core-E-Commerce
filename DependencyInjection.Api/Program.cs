@@ -1,9 +1,10 @@
+using ServiceContracts;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(); // Controllers 등록
-builder.Services.AddScoped<CitiesService>();
+builder.Services.AddScoped<ICitiesService, CitiesService>(); // Register with IoC Container
 
 var app = builder.Build();
 
