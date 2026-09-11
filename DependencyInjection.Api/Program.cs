@@ -1,9 +1,11 @@
+using DependencyInjection.Api.Extensions;
 using ServiceContracts;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(); // Controllers 등록
+builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 builder.Services.AddScoped<ICitiesService, CitiesService>(); // Register with IoC Container
 
 var app = builder.Build();
