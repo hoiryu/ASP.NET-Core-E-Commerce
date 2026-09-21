@@ -1,0 +1,12 @@
+services:
+    mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        restart: always
+        container_name: 6_dotnet_core_mssql_container
+        volumes:
+            - ./database:/var/opt/mssql/data
+        ports:
+            - "1433:1433"
+        environment:
+            ACCEPT_EULA: "Y"
+            MSSQL_SA_PASSWORD: "1Q2w3e4r!"
