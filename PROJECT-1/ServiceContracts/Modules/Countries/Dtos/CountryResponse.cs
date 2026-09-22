@@ -1,6 +1,6 @@
-namespace ServiceContracts.Countries.Dtos;
+namespace ServiceContracts.Modules.Countries.Dtos;
 
-using Entities.Countries;
+using Entities.Modules.Countries;
 
 /// <summary>
 /// DTO class that is used as return type for most of CountriesService methods

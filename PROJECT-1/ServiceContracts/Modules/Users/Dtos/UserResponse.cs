@@ -1,7 +1,7 @@
-using Entities.Users;
-using ServiceContracts.Users.Enums;
+using Entities.Modules.Users;
+using ServiceContracts.Modules.Users.Enums;
 
-namespace ServiceContracts.Users.Dtos;
+namespace ServiceContracts.Modules.Users.Dtos;
 
 public record UserResponse
 {

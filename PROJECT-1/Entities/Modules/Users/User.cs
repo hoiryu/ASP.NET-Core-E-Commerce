@@ -1,4 +1,4 @@
-namespace Entities.Users;
+namespace Entities.Modules.Users;
 
 /// <summary>
 /// Domain Model for User

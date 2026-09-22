@@ -1,11 +1,16 @@
-using Entities.Users;
-using ServiceContracts.Users.Enums;
+using System.ComponentModel.DataAnnotations;
+using Entities.Modules.Users;
+using ServiceContracts.Modules.Users.Enums;
 
-namespace ServiceContracts.Users.Dtos;
+namespace ServiceContracts.Modules.Users.Dtos;
 
 public record UserAddRequest
 {
+	[Required(ErrorMessage = "[Users] Name can't be blank")]
 	public string? Name { get; set; }
+
+	[Required(ErrorMessage = "[Users] Email can't be blank")]
+	[EmailAddress(ErrorMessage = "[Users] Email value should be a vaild email")]
 	public string? Email { get; set; }
 	public DateTime? DateOfBirth { get; set; }
 	public GenderOptions? Gender { get; set; }

@@ -1,4 +1,4 @@
-namespace ServiceContracts.Users.Enums;
+namespace ServiceContracts.Modules.Users.Enums;
 
 public enum GenderOptions
 {

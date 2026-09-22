@@ -1,6 +1,6 @@
-﻿using ServiceContracts.Countries.Dtos;
+﻿using ServiceContracts.Modules.Countries.Dtos;
 
-namespace ServiceContracts.Countries;
+namespace ServiceContracts.Modules.Countries;
 
 /// <summary>
 /// Represents business login for manipulating Country entity

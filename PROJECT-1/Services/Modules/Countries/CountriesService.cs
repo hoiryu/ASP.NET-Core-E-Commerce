@@ -1,8 +1,8 @@
-﻿using Entities.Countries;
-using ServiceContracts.Countries;
-using ServiceContracts.Countries.Dtos;
+﻿using Entities.Modules.Countries;
+using ServiceContracts.Modules.Countries;
+using ServiceContracts.Modules.Countries.Dtos;
 
-namespace Services.Countries;
+namespace Services.Modules.Countries;
 
 public class CountriesService : ICountriesService
 {

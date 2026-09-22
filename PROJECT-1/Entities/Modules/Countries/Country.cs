@@ -1,4 +1,4 @@
-﻿namespace Entities.Countries;
+﻿namespace Entities.Modules.Countries;
 
 /// <summary>
 /// Domain Model for Country

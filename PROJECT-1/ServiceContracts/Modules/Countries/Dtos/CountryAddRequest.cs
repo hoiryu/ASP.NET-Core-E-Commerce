@@ -1,6 +1,6 @@
-namespace ServiceContracts.Countries.Dtos;
+namespace ServiceContracts.Modules.Countries.Dtos;
 
-using Entities.Countries;
+using Entities.Modules.Countries;
 
 /// <summary>
 /// DTO Class for Adding a new country
