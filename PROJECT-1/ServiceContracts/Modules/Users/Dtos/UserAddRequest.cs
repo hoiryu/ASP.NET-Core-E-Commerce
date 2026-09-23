@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Entities.Modules.Countries;
 using Entities.Modules.Users;
 using ServiceContracts.Modules.Users.Enums;
 
@@ -14,7 +15,7 @@ public record UserAddRequest
 	public string? Email { get; set; }
 	public DateTime? DateOfBirth { get; set; }
 	public GenderOptions? Gender { get; set; }
-	public Guid? CountryId { get; set; }
+	public Country? Country { get; set; }
 	public string? Address { get; set; }
 	public bool ReceiveNewsLetters { get; set; }
 
@@ -24,8 +25,8 @@ public record UserAddRequest
 			Name = Name,
 			Email = Email,
 			DateOfBirth = DateOfBirth,
-			Gender = Gender.ToString(),
-			CountryId = CountryId,
+			Gender = Gender?.ToString(),
+			Country = Country,
 			Address = Address,
 			ReceiveNewsLetters = ReceiveNewsLetters,
 		};
