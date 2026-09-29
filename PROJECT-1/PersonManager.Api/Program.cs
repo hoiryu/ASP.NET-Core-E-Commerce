@@ -10,7 +10,11 @@ builder
 	.Services.AddControllers() // Controllers 등록
 	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // enum 을 문자열로 직렬화
 
+// EndPoint 를 kabab-case 로 변환
+builder.Services.AddRouting(o => o.LowercaseUrls = true);
+
 // builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
+
 // Register with IoC Container
 builder.Services.AddSingleton<ICountriesService, CountriesService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
