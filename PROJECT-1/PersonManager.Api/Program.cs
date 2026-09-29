@@ -1,9 +1,19 @@
+using System.Text.Json.Serialization;
+using ServiceContracts.Modules.Countries;
+using ServiceContracts.Modules.Users;
+using Services.Modules.Countries;
+using Services.Modules.Users;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(); // Controllers 등록
+builder
+	.Services.AddControllers() // Controllers 등록
+	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // enum 을 문자열로 직렬화
 
 // builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
-// builder.Services.AddScoped<ICitiesService, CitiesService>(); // Register with IoC Container
+// Register with IoC Container
+builder.Services.AddSingleton<ICountriesService, CountriesService>();
+builder.Services.AddSingleton<IUsersService, UsersService>();
 
 var app = builder.Build();
 
