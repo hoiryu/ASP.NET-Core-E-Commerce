@@ -1,77 +1,114 @@
 using System.Globalization;
+using Entities.Modules.Countries;
 using Entities.Modules.Users;
+using ServiceContracts.Common.Dtos;
 using ServiceContracts.Common.Enums;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Countries.Dtos;
+using ServiceContracts.Modules.Countries.Enums;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
+using ServiceContracts.Modules.Users.Enums;
 using Services.Common.Helpers;
 
 namespace Services.Modules.Users;
 
-public class UsersService(ICountriesService countriesService) : IUsersService
+public class UsersService(ICountriesService countriesService, bool initialize = true) : IUsersService
 {
-	private readonly List<User> _users = [];
+	private readonly List<User> _users = initialize ? CreateMockData(countriesService) : [];
+
+	private static List<User> CreateMockData(ICountriesService countriesService)
+	{
+		List<Country> countries =
+		[
+			.. countriesService
+				.GetCountries(new SearchQuery<CountrySearchOptions>())
+				.Select(c => new Country { Id = c.Id, Name = c.Name }),
+		];
+
+		List<string> names = ["김아무개", "박아무개", "최아무개", "류아무개", "강아무개"];
+
+		return
+		[
+			.. names.Select(
+				(name, i) =>
+					new User
+					{
+						Id = Guid.NewGuid(),
+						Name = name,
+						Email = $"user{i + 1}@example.com",
+						DateOfBirth = new DateTime(1990 + i, i + 1, 10),
+						Gender = i % 2 == 0 ? "Male" : "Female",
+						Country = countries.ElementAtOrDefault(i),
+						Address = $"서울시 {i + 1}번지",
+						ReceiveNewsLetters = i % 2 == 0,
+					}
+			),
+		];
+	}
 
 	private UserResponse ConvertUserToUserResponse(User user)
 	{
 		UserResponse userResponse = user.ToResponse();
-		userResponse.Country = countriesService.GetCountryByCountryId(userResponse.Country?.Id);
+
+		if (userResponse.Country is null)
+			return userResponse;
+
+		SearchQuery<CountrySearchOptions> searchQuery = new()
+		{
+			SearchBy = CountrySearchOptions.Name,
+			SearchString = userResponse.Country.Name?.ToString(),
+		};
+
+		userResponse.Country = countriesService.GetCountries(searchQuery).FirstOrDefault();
 		return userResponse;
 	}
 
-	public UserResponse AddUser(UserAddRequest? userAddRequest)
+	public UserResponse CreateUser(UserCreateRequest? userCreateRequest)
 	{
-		if (userAddRequest == null)
-			throw new ArgumentException(nameof(UserAddRequest));
+		ArgumentNullException.ThrowIfNull(userCreateRequest);
 
-		ValidationHelper.ModelValidation(userAddRequest);
+		ValidationHelper.ModelValidation(userCreateRequest);
 
-		User user = userAddRequest.ToEntity();
+		User user = userCreateRequest.ToEntity();
 		user.Id = Guid.NewGuid();
 		_users.Add(user);
 
 		return ConvertUserToUserResponse(user);
 	}
 
-	public List<UserResponse> GetAllUsers()
+	public List<UserResponse> GetUsers(SearchQuery<UserSearchOptions> query)
 	{
-		return [.. _users.Select(ConvertUserToUserResponse)];
+		List<UserResponse> users = [.. _users.Select(ConvertUserToUserResponse)];
+
+		return SortUsers(FilterUsers(users, query), query);
 	}
 
-	public UserResponse? GetUserByUserId(Guid? userId)
+	private static List<UserResponse> FilterUsers(List<UserResponse> users, SearchQuery<UserSearchOptions> query)
 	{
-		if (userId == null)
-			return null;
+		string? searchString = query.SearchString;
 
-		User? user = _users.FirstOrDefault(temp => temp.Id == userId);
-		if (user == null)
-			return null;
+		if (query.SearchBy is null || string.IsNullOrEmpty(searchString))
+			return users;
 
-		return ConvertUserToUserResponse(user);
-	}
-
-	public List<UserResponse> GetFilteredUsers(string searchBy, string searchString)
-	{
-		List<UserResponse> users = GetAllUsers();
-		List<UserResponse> matchingUsers = users;
-
-		if (string.IsNullOrEmpty(searchBy) && string.IsNullOrEmpty(searchString))
-			return matchingUsers;
-
-		return searchBy switch
+		return query.SearchBy switch
 		{
-			nameof(User.Name) =>
+			UserSearchOptions.Id =>
+			[
+				.. users.Where(temp => Guid.TryParse(searchString, out Guid userId) && temp.Id == userId),
+			],
+
+			UserSearchOptions.Name =>
 			[
 				.. users.Where(temp => temp.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true),
 			],
 
-			nameof(User.Email) =>
+			UserSearchOptions.Email =>
 			[
 				.. users.Where(temp => temp.Email?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true),
 			],
 
-			nameof(User.DateOfBirth) =>
+			UserSearchOptions.DateOfBirth =>
 			[
 				.. users.Where(temp =>
 					temp.DateOfBirth?.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)
@@ -79,24 +116,32 @@ public class UsersService(ICountriesService countriesService) : IUsersService
 				),
 			],
 
-			nameof(User.Gender) =>
+			UserSearchOptions.Gender =>
 			[
 				.. users.Where(temp =>
 					string.Equals(temp.Gender?.ToString(), searchString, StringComparison.OrdinalIgnoreCase)
 				),
 			],
 
-			nameof(User.Country) =>
+			UserSearchOptions.Country =>
 			[
 				.. users.Where(temp =>
 					temp.Country?.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
 				),
 			],
 
-			nameof(User.Address) =>
+			UserSearchOptions.Address =>
 			[
 				.. users.Where(temp =>
 					temp.Address?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true
+				),
+			],
+
+			UserSearchOptions.ReceiveNewsLetters =>
+			[
+				.. users.Where(temp =>
+					bool.TryParse(searchString, out bool receiveNewsLetters)
+					&& temp.ReceiveNewsLetters == receiveNewsLetters
 				),
 			],
 
@@ -104,79 +149,119 @@ public class UsersService(ICountriesService countriesService) : IUsersService
 		};
 	}
 
-	public List<UserResponse> GetSortedUsers(List<UserResponse> users, string sortBy, SortOrderOptions sortOrderOptions)
+	private static List<UserResponse> SortUsers(List<UserResponse> users, SearchQuery<UserSearchOptions> query)
 	{
-		if (string.IsNullOrEmpty(sortBy) || !Enum.IsDefined(sortOrderOptions))
+		if (query.SortBy is null || !Enum.IsDefined(query.SortOrder))
 			return users;
 
-		return (sortBy, sortOrderOptions) switch
+		return (query.SortBy, query.SortOrder) switch
 		{
-			(nameof(UserResponse.Name), SortOrderOptions.ASC) =>
+			(UserSearchOptions.Id, SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.Id)],
+
+			(UserSearchOptions.Id, SortOrderOptions.DESC) => [.. users.OrderByDescending(temp => temp.Id)],
+
+			(UserSearchOptions.Name, SortOrderOptions.ASC) =>
 			[
 				.. users.OrderBy(temp => temp.Name, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Name), SortOrderOptions.DESC) =>
+			(UserSearchOptions.Name, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.Name, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Email), SortOrderOptions.ASC) =>
+			(UserSearchOptions.Email, SortOrderOptions.ASC) =>
 			[
 				.. users.OrderBy(temp => temp.Email, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Email), SortOrderOptions.DESC) =>
+			(UserSearchOptions.Email, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.Email, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.DateOfBirth), SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.DateOfBirth)],
+			(UserSearchOptions.DateOfBirth, SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.DateOfBirth)],
 
-			(nameof(UserResponse.DateOfBirth), SortOrderOptions.DESC) =>
+			(UserSearchOptions.DateOfBirth, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.DateOfBirth),
 			],
 
-			(nameof(UserResponse.Age), SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.Age)],
+			(UserSearchOptions.Gender, SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.Gender)],
 
-			(nameof(UserResponse.Age), SortOrderOptions.DESC) => [.. users.OrderByDescending(temp => temp.Age)],
+			(UserSearchOptions.Gender, SortOrderOptions.DESC) => [.. users.OrderByDescending(temp => temp.Gender)],
 
-			(nameof(UserResponse.Gender), SortOrderOptions.ASC) => [.. users.OrderBy(temp => temp.Gender)],
-
-			(nameof(UserResponse.Gender), SortOrderOptions.DESC) => [.. users.OrderByDescending(temp => temp.Gender)],
-
-			(nameof(UserResponse.Country), SortOrderOptions.ASC) =>
+			(UserSearchOptions.Country, SortOrderOptions.ASC) =>
 			[
 				.. users.OrderBy(temp => temp.Country?.Name, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Country), SortOrderOptions.DESC) =>
+			(UserSearchOptions.Country, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.Country?.Name, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Address), SortOrderOptions.ASC) =>
+			(UserSearchOptions.Address, SortOrderOptions.ASC) =>
 			[
 				.. users.OrderBy(temp => temp.Address, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.Address), SortOrderOptions.DESC) =>
+			(UserSearchOptions.Address, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.Address, StringComparer.OrdinalIgnoreCase),
 			],
 
-			(nameof(UserResponse.ReceiveNewsLetters), SortOrderOptions.ASC) =>
+			(UserSearchOptions.ReceiveNewsLetters, SortOrderOptions.ASC) =>
 			[
 				.. users.OrderBy(temp => temp.ReceiveNewsLetters),
 			],
 
-			(nameof(UserResponse.ReceiveNewsLetters), SortOrderOptions.DESC) =>
+			(UserSearchOptions.ReceiveNewsLetters, SortOrderOptions.DESC) =>
 			[
 				.. users.OrderByDescending(temp => temp.ReceiveNewsLetters),
 			],
 
 			_ => users,
 		};
+	}
+
+	public UserResponse? UpdateUser(UserUpdateRequest? userUpdateRequest)
+	{
+		ArgumentNullException.ThrowIfNull(userUpdateRequest);
+
+		ValidationHelper.ModelValidation(userUpdateRequest);
+
+		User? matchingUser = _users.FirstOrDefault(temp => temp.Id == userUpdateRequest.Id);
+
+		if (matchingUser == null)
+			return null;
+
+		// null 은 "보내지 않음" 으로 보고 기존 값을 유지
+		matchingUser.Name = userUpdateRequest.Name ?? matchingUser.Name;
+		matchingUser.Email = userUpdateRequest.Email ?? matchingUser.Email;
+		matchingUser.DateOfBirth = userUpdateRequest.DateOfBirth ?? matchingUser.DateOfBirth;
+		matchingUser.Gender = userUpdateRequest.Gender?.ToString() ?? matchingUser.Gender;
+		matchingUser.Country = userUpdateRequest.Country ?? matchingUser.Country;
+		matchingUser.Address = userUpdateRequest.Address ?? matchingUser.Address;
+		matchingUser.ReceiveNewsLetters = userUpdateRequest.ReceiveNewsLetters ?? matchingUser.ReceiveNewsLetters;
+
+		return ConvertUserToUserResponse(matchingUser);
+	}
+
+	public UserResponse? DeleteUser(Guid? userId)
+	{
+		if (!userId.HasValue)
+		{
+			throw new ArgumentNullException(nameof(userId));
+		}
+
+		int index = _users.FindIndex(temp => temp.Id == userId);
+		if (index < 0)
+			return null;
+
+		User matchingUser = _users[index];
+		_users.RemoveAt(index);
+
+		return ConvertUserToUserResponse(matchingUser);
 	}
 }

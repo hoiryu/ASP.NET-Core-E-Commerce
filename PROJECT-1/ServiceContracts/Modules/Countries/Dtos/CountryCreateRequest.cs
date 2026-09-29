@@ -5,7 +5,7 @@ using Entities.Modules.Countries;
 /// <summary>
 /// DTO Class for Adding a new country
 /// </summary>
-public record CountryAddRequest
+public record CountryCreateRequest
 {
 	public string? Name { get; init; }
 

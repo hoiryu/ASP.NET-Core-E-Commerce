@@ -1,4 +1,6 @@
-﻿using ServiceContracts.Modules.Countries.Dtos;
+﻿using ServiceContracts.Common.Dtos;
+using ServiceContracts.Modules.Countries.Dtos;
+using ServiceContracts.Modules.Countries.Enums;
 
 namespace ServiceContracts.Modules.Countries;
 
@@ -7,9 +9,7 @@ namespace ServiceContracts.Modules.Countries;
 /// </summary>
 public interface ICountriesService
 {
-	CountryResponse AddCountry(CountryAddRequest? countryAddRequest);
+	CountryResponse CreateCountry(CountryCreateRequest? countryCreateRequest);
 
-	List<CountryResponse> GetAllCountries();
-
-	CountryResponse? GetCountryByCountryId(Guid? countryId);
+	List<CountryResponse> GetCountries(SearchQuery<CountrySearchOptions> query);
 }
