@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Entities.Data;
+using Microsoft.EntityFrameworkCore;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Users;
 using Services.Modules.Countries;
@@ -6,18 +8,28 @@ using Services.Modules.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region Register Controllers
 builder
-	.Services.AddControllers() // Controllers 등록
+	.Services.AddControllers()
 	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // enum 을 문자열로 직렬화
+#endregion
 
-// EndPoint 를 kabab-case 로 변환
+#region EndPoint 를 kabab-case 로 변환
 builder.Services.AddRouting(o => o.LowercaseUrls = true);
+#endregion
 
 // builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
-// Register with IoC Container
+#region Register with IoC Container
 builder.Services.AddSingleton<ICountriesService, CountriesService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
+#endregion
+
+#region Register DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
+);
+#endregion
 
 var app = builder.Build();
 
