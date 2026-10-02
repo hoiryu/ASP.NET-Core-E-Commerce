@@ -21,8 +21,8 @@ builder.Services.AddRouting(o => o.LowercaseUrls = true);
 // builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
 #region Register with IoC Container
-builder.Services.AddSingleton<ICountriesService, CountriesService>();
-builder.Services.AddSingleton<IUsersService, UsersService>();
+builder.Services.AddScoped<ICountriesService, CountriesService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 #endregion
 
 #region Register DbContext

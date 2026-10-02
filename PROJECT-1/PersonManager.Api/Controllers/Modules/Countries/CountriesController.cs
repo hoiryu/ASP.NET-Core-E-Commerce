@@ -1,18 +1,25 @@
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Countries.Dtos;
-using ServiceContracts.Modules.Countries.Enums;
 
 namespace PersonManager.Api.Controllers.Modules.Countries
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class CountriesController(ICountriesService countriesService) : ControllerBase
+	public class CountriesController(ICountriesService _countriesService) : ControllerBase
 	{
-		public ActionResult<List<CountryResponse>> GetCountries([FromQuery] SearchQuery<CountrySearchOptions> query)
+		public ActionResult<CountryResponse> CreateCountry([FromBody] CountryCreateRequest countryCreateRequest)
 		{
-			return countriesService.GetCountries(query);
+			return _countriesService.CreateCountry(countryCreateRequest);
+		}
+
+		[HttpGet]
+		public ActionResult<List<CountryResponse>> GetCountries(
+			[FromQuery(Name = "filter")] CountryFilter filter,
+			[FromQuery(Name = "sort")] CountrySort sort
+		)
+		{
+			return _countriesService.GetCountries(filter, sort);
 		}
 	}
 }

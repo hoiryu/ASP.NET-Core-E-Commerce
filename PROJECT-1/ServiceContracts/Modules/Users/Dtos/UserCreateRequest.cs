@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Entities.Modules.Countries;
 using Entities.Modules.Users;
+using ServiceContracts.Modules.Countries.Dtos;
 using ServiceContracts.Modules.Users.Enums;
 
 namespace ServiceContracts.Modules.Users.Dtos;
@@ -17,7 +17,7 @@ public record UserCreateRequest
 
 	[EnumDataType(typeof(GenderOptions), ErrorMessage = "[Users] Gender value is invalid")]
 	public GenderOptions? Gender { get; set; }
-	public Country? Country { get; set; }
+	public CountryResponse? Country { get; set; }
 	public string? Address { get; set; }
 	public bool ReceiveNewsLetters { get; set; }
 
@@ -28,7 +28,7 @@ public record UserCreateRequest
 			Email = Email,
 			DateOfBirth = DateOfBirth,
 			Gender = Gender?.ToString(),
-			Country = Country,
+			CountryId = Country?.Id,
 			Address = Address,
 			ReceiveNewsLetters = ReceiveNewsLetters,
 		};

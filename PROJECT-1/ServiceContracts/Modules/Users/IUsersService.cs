@@ -1,6 +1,4 @@
-using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Users.Dtos;
-using ServiceContracts.Modules.Users.Enums;
 
 namespace ServiceContracts.Modules.Users;
 
@@ -8,7 +6,7 @@ public interface IUsersService
 {
 	UserResponse CreateUser(UserCreateRequest? userCreateRequest);
 
-	List<UserResponse> GetUsers(SearchQuery<UserSearchOptions> query);
+	List<UserResponse> GetUsers(UserFilter filter, UserSort sort);
 
 	UserResponse? UpdateUser(UserUpdateRequest? userUpdateRequest);
 

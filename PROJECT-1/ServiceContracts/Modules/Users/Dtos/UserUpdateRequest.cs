@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Entities.Modules.Countries;
+using ServiceContracts.Modules.Countries.Dtos;
 using ServiceContracts.Modules.Users.Enums;
 
 namespace ServiceContracts.Modules.Users.Dtos;
@@ -18,7 +18,7 @@ public class UserUpdateRequest
 
 	[EnumDataType(typeof(GenderOptions), ErrorMessage = "[Users] Gender value is invalid")]
 	public GenderOptions? Gender { get; set; }
-	public Country? Country { get; set; }
+	public CountryResponse? Country { get; set; }
 	public string? Address { get; set; }
 	public bool? ReceiveNewsLetters { get; set; }
 }

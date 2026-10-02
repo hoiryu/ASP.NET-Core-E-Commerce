@@ -1,22 +1,14 @@
-﻿using Entities.Modules.Countries;
-using ServiceContracts.Common.Dtos;
+﻿using System.Linq.Expressions;
+using Entities.Data;
+using Entities.Modules.Countries;
 using ServiceContracts.Common.Enums;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Countries.Dtos;
-using ServiceContracts.Modules.Countries.Enums;
 
 namespace Services.Modules.Countries;
 
-public class CountriesService(bool initialize = true) : ICountriesService
+public class CountriesService(AppDbContext _db) : ICountriesService
 {
-	private readonly List<Country> _countries = initialize ? CreateMockData() : [];
-
-	private static List<Country> CreateMockData()
-	{
-		List<string> sourceArray = ["Korea", "Japan", "USA", "India", "Australia"];
-		return [.. sourceArray.Select(name => new Country { Id = Guid.NewGuid(), Name = name })];
-	}
-
 	public CountryResponse CreateCountry(CountryCreateRequest? countryCreateRequest)
 	{
 		if (countryCreateRequest == null || countryCreateRequest.Name == null)
@@ -24,78 +16,68 @@ public class CountriesService(bool initialize = true) : ICountriesService
 			throw new ArgumentException("countryCreateRequest and countryCreateRequest.Name must not be null");
 		}
 
-		if (_countries.Any(temp => temp.Name == countryCreateRequest.Name))
+		if (_db.Countries.Any(temp => temp.Name == countryCreateRequest.Name))
 		{
 			throw new ArgumentException("Given country name already exists");
 		}
 
 		Country country = countryCreateRequest.ToEntity();
 
-		country.Id = Guid.NewGuid();
-
-		_countries.Add(country);
+		_db.Countries.Add(country);
+		_db.SaveChanges();
 
 		return country.ToResponse();
 	}
 
-	public List<CountryResponse> GetCountries(SearchQuery<CountrySearchOptions> query)
+	public List<CountryResponse> GetCountries(CountryFilter filter, CountrySort sort)
 	{
-		List<CountryResponse> countries = [.. _countries.Select(country => country.ToResponse())];
+		IQueryable<Country> countries = _db.Countries;
 
-		return SortCountries(FilterCountries(countries, query), query);
+		countries = FilterCountries(countries, filter);
+		countries = SortCountries(countries, sort);
+
+		// 여기서 SQL 실행 (WHERE + ORDER BY 포함)
+		return [.. countries.Select(country => country.ToResponse())];
 	}
 
-	private static List<CountryResponse> FilterCountries(
-		List<CountryResponse> countries,
-		SearchQuery<CountrySearchOptions> query
-	)
+	private static IQueryable<Country> FilterCountries(IQueryable<Country> countries, CountryFilter filter)
 	{
-		string? searchString = query.SearchString;
+		// 값이 있는 조건만 Where 로 이어 붙임 (AND)
+		if (filter.Id is Guid countryId)
+			countries = countries.Where(temp => temp.Id == countryId);
 
-		if (query.SearchBy is null || string.IsNullOrEmpty(searchString))
-			return countries;
+		if (!string.IsNullOrEmpty(filter.Name))
+			countries = countries.Where(temp => temp.Name != null && temp.Name.Contains(filter.Name));
 
-		return query.SearchBy switch
-		{
-			CountrySearchOptions.Id =>
-			[
-				.. countries.Where(temp => Guid.TryParse(searchString, out Guid countryId) && temp.Id == countryId),
-			],
-
-			CountrySearchOptions.Name =>
-			[
-				.. countries.Where(temp => temp.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) == true),
-			],
-
-			_ => countries,
-		};
+		return countries;
 	}
 
-	private static List<CountryResponse> SortCountries(
-		List<CountryResponse> countries,
-		SearchQuery<CountrySearchOptions> query
+	private static IQueryable<Country> SortCountries(IQueryable<Country> countries, CountrySort sort)
+	{
+		// 값이 있는 조건만 첫 번째는 OrderBy, 이후는 ThenBy 로 이어 붙임
+		IOrderedQueryable<Country>? ordered = null;
+
+		ordered = ApplySort(countries, ordered, sort.Id, temp => temp.Id);
+		ordered = ApplySort(countries, ordered, sort.Name, temp => temp.Name);
+
+		return ordered ?? countries;
+	}
+
+	private static IOrderedQueryable<Country>? ApplySort<TKey>(
+		IQueryable<Country> countries,
+		IOrderedQueryable<Country>? ordered,
+		SortOrderOptions? sortOrder,
+		Expression<Func<Country, TKey>> keySelector
 	)
 	{
-		if (query.SortBy is null || !Enum.IsDefined(query.SortOrder))
-			return countries;
+		if (sortOrder is null)
+			return ordered;
 
-		return (query.SortBy, query.SortOrder) switch
-		{
-			(CountrySearchOptions.Id, SortOrderOptions.ASC) => [.. countries.OrderBy(temp => temp.Id)],
+		bool descending = sortOrder == SortOrderOptions.DESC;
 
-			(CountrySearchOptions.Id, SortOrderOptions.DESC) => [.. countries.OrderByDescending(temp => temp.Id)],
+		if (ordered is null)
+			return descending ? countries.OrderByDescending(keySelector) : countries.OrderBy(keySelector);
 
-			(CountrySearchOptions.Name, SortOrderOptions.ASC) =>
-			[
-				.. countries.OrderBy(temp => temp.Name, StringComparer.OrdinalIgnoreCase),
-			],
-
-			(CountrySearchOptions.Name, SortOrderOptions.DESC) =>
-			[
-				.. countries.OrderByDescending(temp => temp.Name, StringComparer.OrdinalIgnoreCase),
-			],
-
-			_ => countries,
-		};
+		return descending ? ordered.ThenByDescending(keySelector) : ordered.ThenBy(keySelector);
 	}
 }

@@ -1,25 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
-using ServiceContracts.Modules.Users.Enums;
 
 namespace PersonManager.Api.Controllers.Modules.Users
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class UsersController(IUsersService usersService) : ControllerBase
+	public class UsersController(IUsersService _usersService) : ControllerBase
 	{
 		[HttpPost]
 		public ActionResult<UserResponse> CreateUser([FromBody] UserCreateRequest userCreateRequest)
 		{
-			return usersService.CreateUser(userCreateRequest);
+			return _usersService.CreateUser(userCreateRequest);
 		}
 
 		[HttpGet]
-		public ActionResult<List<UserResponse>> GetUsers([FromQuery] SearchQuery<UserSearchOptions> query)
+		public ActionResult<List<UserResponse>> GetUsers(
+			[FromQuery(Name = "filter")] UserFilter filter,
+			[FromQuery(Name = "sort")] UserSort sort
+		)
 		{
-			return usersService.GetUsers(query);
+			return _usersService.GetUsers(filter, sort);
 		}
 
 		[HttpPatch("{userId:guid}")]
@@ -30,7 +31,7 @@ namespace PersonManager.Api.Controllers.Modules.Users
 		{
 			userUpdateRequest.Id = userId;
 
-			UserResponse? userResponse = usersService.UpdateUser(userUpdateRequest);
+			UserResponse? userResponse = _usersService.UpdateUser(userUpdateRequest);
 			if (userResponse is null)
 				return NotFound();
 
@@ -40,7 +41,7 @@ namespace PersonManager.Api.Controllers.Modules.Users
 		[HttpDelete("{userId:guid}")]
 		public ActionResult<UserResponse> DeleteUser([FromRoute] Guid userId)
 		{
-			UserResponse? userResponse = usersService.DeleteUser(userId);
+			UserResponse? userResponse = _usersService.DeleteUser(userId);
 			if (userResponse is null)
 				return NotFound();
 
