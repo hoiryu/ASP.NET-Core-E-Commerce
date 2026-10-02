@@ -1,3 +1,5 @@
+<!-- @format -->
+
 ## 시작하기
 
 - docker 실행
@@ -49,6 +51,16 @@ dotnet ef --version # 버전이 출력되면 성공
 ```bash
 dotnet ef migrations add <마이그레이션이름> --project Entities --startup-project PersonManager.Api
 ```
+
+> `<마이그레이션이름>`은 생략 불가. PascalCase로 변경 내용을 설명하는 이름 사용 (파일명은 `타임스탬프_이름.cs`로 생성됨)
+>
+> | 상황             | 예시                   |
+> | ---------------- | ---------------------- |
+> | 최초 생성        | `InitialCreate`        |
+> | 컬럼 추가        | `AddPhoneToUsers`      |
+> | 테이블 추가      | `AddOrdersTable`       |
+> | 컬럼 변경        | `ChangeUserNameLength` |
+> | 시드 데이터 수정 | `FixUserCountrySeed`   |
 
 3. DB에 적용 (테이블 생성/변경 + `HasData` 시드 데이터 INSERT)
 
