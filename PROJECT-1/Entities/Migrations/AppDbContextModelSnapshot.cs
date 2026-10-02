@@ -30,39 +30,65 @@ namespace Entities.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("name");
 
                     b.HasKey("Id")
                         .HasName("pk_countries");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_countries_name")
+                        .HasFilter("[name] IS NOT NULL");
 
                     b.ToTable("countries", (string)null);
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("14629847-905a-4a0e-9abe-80b61655c5cb"),
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Name = "Korea"
                         },
                         new
                         {
-                            Id = new Guid("56bf46a4-02b8-4693-a0f5-0a95e2218bdc"),
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
                             Name = "Thailand"
                         },
                         new
                         {
-                            Id = new Guid("12e15727-d369-49a9-8b13-bc22e9362179"),
+                            Id = new Guid("00000000-0000-0000-0000-000000000003"),
                             Name = "China"
                         },
                         new
                         {
-                            Id = new Guid("8f30bedc-47dd-4286-8950-73d8a68e5d41"),
+                            Id = new Guid("00000000-0000-0000-0000-000000000004"),
                             Name = "Palestinian Territory"
                         },
                         new
                         {
-                            Id = new Guid("501c6d33-1bbe-45f1-8fbd-2275913c6218"),
-                            Name = "China"
+                            Id = new Guid("00000000-0000-0000-0000-000000000005"),
+                            Name = "India"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000006"),
+                            Name = "Argentina"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000007"),
+                            Name = "Brazil"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000008"),
+                            Name = "Canada"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000009"),
+                            Name = "Denmark"
                         });
                 });
 
@@ -116,122 +142,134 @@ namespace Entities.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c03bbe45-9aeb-4d24-99e0-4743016ffce9"),
-                            Address = "4 Parkside Point",
+                            Id = new Guid("00000000-0000-0000-0001-000000000001"),
+                            Address = "서울특별시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000002"),
                             DateOfBirth = new DateTime(1989, 8, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "mwebsdale0@people.com.cn",
+                            Email = "test1@mail.com",
                             Gender = "Female",
-                            Name = "Marguerite",
+                            Name = "김아무개",
                             ReceiveNewsLetters = false
                         },
                         new
                         {
-                            Id = new Guid("c3abddbd-cf50-41d2-b6c4-cc7d5a750928"),
-                            Address = "6 Morningstar Circle",
+                            Id = new Guid("00000000-0000-0000-0001-000000000002"),
+                            Address = "경기도 안성시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000001"),
                             DateOfBirth = new DateTime(1990, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "ushears1@globo.com",
+                            Email = "test2@mail.com",
                             Gender = "Female",
-                            Name = "Ursa",
+                            Name = "최아무개",
                             ReceiveNewsLetters = false
                         },
                         new
                         {
-                            Id = new Guid("c6d50a47-f7e6-4482-8be0-4ddfc057fa6e"),
-                            Address = "73 Heath Avenue",
+                            Id = new Guid("00000000-0000-0000-0001-000000000003"),
+                            Address = "부산광역시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000001"),
                             DateOfBirth = new DateTime(1995, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "fbowsher2@howstuffworks.com",
+                            Email = "test3@mail.com",
                             Gender = "Male",
-                            Name = "Franchot",
+                            Name = "박아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("d15c6d9f-70b4-48c5-afd3-e71261f1a9be"),
-                            Address = "83187 Merry Drive",
+                            Id = new Guid("00000000-0000-0000-0001-000000000004"),
+                            Address = "경기도 수원시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000003"),
                             DateOfBirth = new DateTime(1987, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "asarvar3@dropbox.com",
+                            Email = "test4@mail.com",
                             Gender = "Male",
-                            Name = "Angie",
+                            Name = "우아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("89e5f445-d89f-4e12-94e0-5ad5b235d704"),
-                            Address = "50467 Holy Cross Crossing",
+                            Id = new Guid("00000000-0000-0000-0001-000000000005"),
+                            Address = "강원도 춘천시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000002"),
                             DateOfBirth = new DateTime(1995, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "ttregona4@stumbleupon.com",
+                            Email = "test5@mail.com",
                             Gender = "Gender",
-                            Name = "Tani",
+                            Name = "강아무개",
                             ReceiveNewsLetters = false
                         },
                         new
                         {
-                            Id = new Guid("2a6d3738-9def-43ac-9279-0310edc7ceca"),
-                            Address = "97570 Raven Circle",
+                            Id = new Guid("00000000-0000-0000-0001-000000000006"),
+                            Address = "인천광역시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000004"),
                             DateOfBirth = new DateTime(1988, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "mlingfoot5@netvibes.com",
+                            Email = "test6@mail.com",
                             Gender = "Male",
-                            Name = "Mitchael",
+                            Name = "오아무개",
                             ReceiveNewsLetters = false
                         },
                         new
                         {
-                            Id = new Guid("29339209-63f5-492f-8459-754943c74abf"),
-                            Address = "57449 Brown Way",
+                            Id = new Guid("00000000-0000-0000-0001-000000000007"),
+                            Address = "충청북도 청주시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000003"),
                             DateOfBirth = new DateTime(1983, 2, 16, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "mjarrell6@wisc.edu",
+                            Email = "test7@mail.com",
                             Gender = "Male",
-                            Name = "Maddy",
+                            Name = "연아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("ac660a73-b0b7-4340-abc1-a914257a6189"),
-                            Address = "4 Stuart Drive",
+                            Id = new Guid("00000000-0000-0000-0001-000000000008"),
+                            Address = "대구광역시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000003"),
                             DateOfBirth = new DateTime(1998, 12, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "pretchford7@virginia.edu",
+                            Email = "test8@mail.com",
                             Gender = "Female",
-                            Name = "Pegeen",
+                            Name = "유아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("012107df-862f-4f16-ba94-e5c16886f005"),
-                            Address = "413 Sachtjen Way",
+                            Id = new Guid("00000000-0000-0000-0001-000000000009"),
+                            Address = "전라북도 전주시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000003"),
                             DateOfBirth = new DateTime(1990, 9, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "hmosco8@tripod.com",
+                            Email = "test9@mail.com",
                             Gender = "Male",
-                            Name = "Hansiain",
+                            Name = "한아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("cb035f22-e7cf-4907-bd07-91cfee5240f3"),
-                            Address = "484 Clarendon Court",
+                            Id = new Guid("00000000-0000-0000-0001-000000000010"),
+                            Address = "경상남도 창원시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000004"),
                             DateOfBirth = new DateTime(1997, 9, 25, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "lwoodwing9@wix.com",
+                            Email = "test10@mail.com",
                             Gender = "Male",
-                            Name = "Lombard",
+                            Name = "이아무개",
                             ReceiveNewsLetters = false
                         },
                         new
                         {
-                            Id = new Guid("28d11936-9466-4a4b-b9c5-2f0a8e0cbde9"),
-                            Address = "2 Warrior Avenue",
+                            Id = new Guid("00000000-0000-0000-0001-000000000011"),
+                            Address = "광주광역시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000008"),
                             DateOfBirth = new DateTime(1990, 5, 24, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "mconachya@va.gov",
+                            Email = "test11@mail.com",
                             Gender = "Female",
-                            Name = "Minta",
+                            Name = "차아무개",
                             ReceiveNewsLetters = true
                         },
                         new
                         {
-                            Id = new Guid("a3b9833b-8a4d-43e9-8690-61e08df81a9a"),
-                            Address = "9334 Fremont Street",
+                            Id = new Guid("00000000-0000-0000-0001-000000000012"),
+                            Address = "제주특별자치도 제주시",
+                            CountryId = new Guid("00000000-0000-0000-0000-000000000008"),
                             DateOfBirth = new DateTime(1987, 1, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "vklussb@nationalgeographic.com",
+                            Email = "test12@mail.com",
                             Gender = "Female",
-                            Name = "Verene",
+                            Name = "초아무개",
                             ReceiveNewsLetters = true
                         });
                 });

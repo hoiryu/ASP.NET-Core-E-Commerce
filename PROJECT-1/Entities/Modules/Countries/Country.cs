@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Entities.Modules.Countries;
 
-/// <summary>
-/// Domain Model for Country
-/// </summary>
+[Index(nameof(Name), IsUnique = true)]
 public class Country
 {
 	[Key]
 	public Guid Id { get; set; }
+
+	[StringLength(100)]
 	public string? Name { get; set; }
 }
