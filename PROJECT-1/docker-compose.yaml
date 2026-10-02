@@ -4,7 +4,7 @@ services:
         restart: always
         container_name: 6_dotnet_core_mssql_container
         volumes:
-            - ./database:/var/opt/mssql/data
+            - ./Database:/var/opt/mssql/data
         ports:
             - "1433:1433"
         environment:
