@@ -32,6 +32,7 @@ namespace PersonManager.Api.Controllers.Modules.Users
 			userUpdateRequest.Id = userId;
 
 			UserResponse? userResponse = _usersService.UpdateUser(userUpdateRequest);
+
 			if (userResponse is null)
 				return NotFound();
 
@@ -42,6 +43,7 @@ namespace PersonManager.Api.Controllers.Modules.Users
 		public ActionResult<UserResponse> DeleteUser([FromRoute] Guid userId)
 		{
 			UserResponse? userResponse = _usersService.DeleteUser(userId);
+
 			if (userResponse is null)
 				return NotFound();
 
