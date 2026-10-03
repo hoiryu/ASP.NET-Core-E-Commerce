@@ -10,4 +10,8 @@ public interface ICountriesService
 	CountryResponse CreateCountry(CountryCreateRequest? countryCreateRequest);
 
 	List<CountryResponse> GetCountries(CountryFilter filter, CountrySort sort);
+
+	CountryResponse? UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
+
+	CountryResponse? DeleteCountry(Guid? countryId);
 }
