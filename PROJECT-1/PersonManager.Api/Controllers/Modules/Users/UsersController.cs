@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
 
@@ -17,10 +18,11 @@ namespace PersonManager.Api.Controllers.Modules.Users
 		[HttpGet]
 		public ActionResult<List<UserResponse>> GetUsers(
 			[FromQuery(Name = "filter")] UserFilter filter,
-			[FromQuery(Name = "sort")] UserSort sort
+			[FromQuery(Name = "order")] UserOrder order,
+			[FromQuery(Name = "paging")] Paging paging
 		)
 		{
-			return _usersService.GetUsers(filter, sort);
+			return _usersService.GetUsers(filter, order, paging);
 		}
 
 		[HttpPatch("{userId:guid}")]

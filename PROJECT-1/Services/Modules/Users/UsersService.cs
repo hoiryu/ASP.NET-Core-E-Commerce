@@ -1,12 +1,12 @@
-using System.Linq.Expressions;
 using Entities.Data;
 using Entities.Modules.Users;
 using Microsoft.EntityFrameworkCore;
-using ServiceContracts.Common.Enums;
+using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
-using ServiceContracts.Modules.Users.Enums;
+using Services.Common.Extensions;
 using Services.Common.Helpers;
+using Services.Modules.Users.Extensions;
 
 namespace Services.Modules.Users;
 
@@ -32,92 +32,14 @@ public class UsersService(AppDbContext _db) : IUsersService
 		return user.ToResponse();
 	}
 
-	public List<UserResponse> GetUsers(UserFilter filter, UserSort sort)
+	public List<UserResponse> GetUsers(UserFilter filter, UserOrder order, Paging paging)
 	{
 		IQueryable<User> users = _db.Users.Include(temp => temp.Country);
 
-		users = FilterUsers(users, filter);
-		users = SortUsers(users, sort);
+		users = users.ApplyFiltering(filter).ApplyOrdering(order).ApplyPaging(paging);
 
-		// 여기서 SQL 실행 (JOIN + WHERE + ORDER BY 포함)
+		// 여기서 SQL 실행 (JOIN + WHERE + ORDER BY + OFFSET/FETCH 포함)
 		return [.. users.Select(user => user.ToResponse())];
-	}
-
-	private static IQueryable<User> FilterUsers(IQueryable<User> users, UserFilter filter)
-	{
-		// 값이 있는 조건만 Where 로 이어 붙임 (AND)
-		if (filter.Id is Guid userId)
-			users = users.Where(temp => temp.Id == userId);
-
-		if (!string.IsNullOrEmpty(filter.Name))
-			users = users.Where(temp => temp.Name != null && temp.Name.Contains(filter.Name));
-
-		if (!string.IsNullOrEmpty(filter.Email))
-			users = users.Where(temp => temp.Email != null && temp.Email.Contains(filter.Email));
-
-		if (filter.DateOfBirth is DateTime dateOfBirth)
-			users = users.Where(temp => temp.DateOfBirth != null && temp.DateOfBirth.Value.Date == dateOfBirth.Date);
-
-		if (filter.Gender is GenderOptions gender)
-		{
-			string genderString = gender.ToString();
-			users = users.Where(temp => temp.Gender == genderString);
-		}
-
-		if (filter.Country?.Id is Guid countryId)
-			users = users.Where(temp => temp.CountryId == countryId);
-
-		if (!string.IsNullOrEmpty(filter.Country?.Name))
-		{
-			string countryName = filter.Country.Name;
-			users = users.Where(temp =>
-				temp.Country != null && temp.Country.Name != null && temp.Country.Name.Contains(countryName)
-			);
-		}
-
-		if (!string.IsNullOrEmpty(filter.Address))
-			users = users.Where(temp => temp.Address != null && temp.Address.Contains(filter.Address));
-
-		if (filter.ReceiveNewsLetters is bool receiveNewsLetters)
-			users = users.Where(temp => temp.ReceiveNewsLetters == receiveNewsLetters);
-
-		return users;
-	}
-
-	private static IQueryable<User> SortUsers(IQueryable<User> users, UserSort sort)
-	{
-		// 값이 있는 조건만 첫 번째는 OrderBy, 이후는 ThenBy 로 이어 붙임
-		IOrderedQueryable<User>? ordered = null;
-
-		ordered = ApplySort(users, ordered, sort.Id, temp => temp.Id);
-		ordered = ApplySort(users, ordered, sort.Name, temp => temp.Name);
-		ordered = ApplySort(users, ordered, sort.Email, temp => temp.Email);
-		ordered = ApplySort(users, ordered, sort.DateOfBirth, temp => temp.DateOfBirth);
-		ordered = ApplySort(users, ordered, sort.Gender, temp => temp.Gender);
-		ordered = ApplySort(users, ordered, sort.Country?.Id, temp => temp.CountryId);
-		ordered = ApplySort(users, ordered, sort.Country?.Name, temp => temp.Country!.Name);
-		ordered = ApplySort(users, ordered, sort.Address, temp => temp.Address);
-		ordered = ApplySort(users, ordered, sort.ReceiveNewsLetters, temp => temp.ReceiveNewsLetters);
-
-		return ordered ?? users;
-	}
-
-	private static IOrderedQueryable<User>? ApplySort<T>(
-		IQueryable<User> users,
-		IOrderedQueryable<User>? ordered,
-		SortOrderOptions? sortOrder,
-		Expression<Func<User, T>> keySelector
-	)
-	{
-		if (sortOrder is null)
-			return ordered;
-
-		bool descending = sortOrder == SortOrderOptions.DESC;
-
-		if (ordered is null)
-			return descending ? users.OrderByDescending(keySelector) : users.OrderBy(keySelector);
-
-		return descending ? ordered.ThenByDescending(keySelector) : ordered.ThenBy(keySelector);
 	}
 
 	public UserResponse? UpdateUser(UserUpdateRequest? userUpdateRequest)

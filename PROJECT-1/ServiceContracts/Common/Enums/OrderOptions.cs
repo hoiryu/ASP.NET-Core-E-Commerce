@@ -1,6 +1,6 @@
 namespace ServiceContracts.Common.Enums;
 
-public enum SortOrderOptions
+public enum OrderOptions
 {
 	ASC,
 	DESC,

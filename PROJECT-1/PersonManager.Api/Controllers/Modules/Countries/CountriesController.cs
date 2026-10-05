@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Countries.Dtos;
 
@@ -16,10 +17,11 @@ namespace PersonManager.Api.Controllers.Modules.Countries
 		[HttpGet]
 		public ActionResult<List<CountryResponse>> GetCountries(
 			[FromQuery] CountryFilter filter,
-			[FromQuery] CountrySort sort
+			[FromQuery(Name = "order")] CountryOrder order,
+			[FromQuery] Paging paging
 		)
 		{
-			return _countriesService.GetCountries(filter, sort);
+			return _countriesService.GetCountries(filter, order, paging);
 		}
 
 		[HttpPatch("{countryId:guid}")]

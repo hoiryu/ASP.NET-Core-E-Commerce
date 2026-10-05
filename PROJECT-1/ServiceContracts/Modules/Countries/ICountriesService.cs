@@ -1,4 +1,5 @@
-﻿using ServiceContracts.Modules.Countries.Dtos;
+﻿using ServiceContracts.Common.Dtos;
+using ServiceContracts.Modules.Countries.Dtos;
 
 namespace ServiceContracts.Modules.Countries;
 
@@ -9,7 +10,7 @@ public interface ICountriesService
 {
 	CountryResponse CreateCountry(CountryCreateRequest? countryCreateRequest);
 
-	List<CountryResponse> GetCountries(CountryFilter filter, CountrySort sort);
+	List<CountryResponse> GetCountries(CountryFilter filter, CountryOrder order, Paging paging);
 
 	CountryResponse? UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
 
