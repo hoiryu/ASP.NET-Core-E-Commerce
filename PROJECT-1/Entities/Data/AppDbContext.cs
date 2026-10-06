@@ -15,8 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	{
 		base.OnModelCreating(modelBuilder);
 
-		modelBuilder.Entity<Country>();
-		modelBuilder.Entity<User>();
+		modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
 		string countriesJsonPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seeds", "countries.json");
 		string countriesJsonData = File.ReadAllText(countriesJsonPath);
