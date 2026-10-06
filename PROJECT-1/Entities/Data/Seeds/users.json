@@ -44,7 +44,7 @@
 		"Name": "강아무개",
 		"Email": "test5@mail.com",
 		"DateOfBirth": "1995-02-11",
-		"Gender": "Gender",
+		"Gender": "Female",
 		"CountryId": "00000000-0000-0000-0000-000000000002",
 		"Address": "강원도 춘천시",
 		"ReceiveNewsLetters": false

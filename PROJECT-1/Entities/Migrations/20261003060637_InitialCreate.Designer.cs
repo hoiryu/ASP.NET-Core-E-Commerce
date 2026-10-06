@@ -299,7 +299,7 @@ namespace Entities.Migrations
                             CountryId = new Guid("00000000-0000-0000-0000-000000000002"),
                             DateOfBirth = new DateTime(1995, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "test5@mail.com",
-                            Gender = "Gender",
+                            Gender = "Female",
                             Name = "강아무개",
                             ReceiveNewsLetters = false
                         },
