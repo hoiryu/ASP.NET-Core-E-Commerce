@@ -5,11 +5,11 @@ namespace ServiceContracts.Modules.Users;
 
 public interface IUsersService
 {
-	UserResponse CreateUser(UserCreateRequest? userCreateRequest);
+	Task<UserResponse> CreateUser(UserCreateRequest? userCreateRequest);
 
-	List<UserResponse> GetUsers(UserFilter filter, UserOrder order, Paging paging);
+	Task<List<UserResponse>> GetUsers(UserFilter filter, UserOrder order, Paging paging);
 
-	UserResponse? UpdateUser(UserUpdateRequest? userUpdateRequest);
+	Task<UserResponse?> UpdateUser(UserUpdateRequest? userUpdateRequest);
 
-	UserResponse? DeleteUser(Guid? userId);
+	Task<UserResponse?> DeleteUser(Guid? userId);
 }

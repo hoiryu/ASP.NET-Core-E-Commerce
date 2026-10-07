@@ -8,11 +8,11 @@ namespace ServiceContracts.Modules.Countries;
 /// </summary>
 public interface ICountriesService
 {
-	CountryResponse CreateCountry(CountryCreateRequest? countryCreateRequest);
+	Task<CountryResponse> CreateCountry(CountryCreateRequest? countryCreateRequest);
 
-	List<CountryResponse> GetCountries(CountryFilter filter, CountryOrder order, Paging paging);
+	Task<List<CountryResponse>> GetCountries(CountryFilter filter, CountryOrder order, Paging paging);
 
-	CountryResponse? UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
+	Task<CountryResponse?> UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
 
-	CountryResponse? DeleteCountry(Guid? countryId);
+	Task<CountryResponse?> DeleteCountry(Guid? countryId);
 }
