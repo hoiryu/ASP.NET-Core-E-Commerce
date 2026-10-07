@@ -9,11 +9,11 @@ public static class QueryableExtensions
 	/// <summary>
 	/// 정렬 옵션 값이 있으면 첫 번째는 OrderBy, 이후는 ThenBy 로 이어 붙임 (값이 없으면 ordered 그대로 반환)
 	/// </summary>
-	internal static IOrderedQueryable<T>? OrderByOption<T, TKey>(
+	internal static IOrderedQueryable<T>? OrderByOption<T, U>(
 		this IQueryable<T> query,
 		IOrderedQueryable<T>? ordered,
 		OrderOptions? order,
-		Expression<Func<T, TKey>> keySelector
+		Expression<Func<T, U>> keySelector
 	)
 	{
 		if (order is null)

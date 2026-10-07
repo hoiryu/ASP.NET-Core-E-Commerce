@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 #region Register Controllers
 builder
 	.Services.AddControllers()
-	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // enum 을 문자열로 직렬화
+	.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // Enum 을 문자열로 직렬화
 #endregion
 
 #region EndPoint 를 kabab-case 로 변환
