@@ -1,0 +1,35 @@
+using System.ComponentModel.DataAnnotations;
+using PersonManager.Entities.Modules.Users;
+using PersonManager.ServiceContracts.Modules.Countries.Dtos;
+using PersonManager.ServiceContracts.Modules.Users.Enums;
+
+namespace PersonManager.ServiceContracts.Modules.Users.Dtos;
+
+public record UserCreateRequest
+{
+	[Required(ErrorMessage = "[Users] Name can't be blank")]
+	public string? Name { get; set; }
+
+	[Required(ErrorMessage = "[Users] Email can't be blank")]
+	[EmailAddress(ErrorMessage = "[Users] Email value should be a vaild email")]
+	public string? Email { get; set; }
+	public DateTime? DateOfBirth { get; set; }
+
+	[EnumDataType(typeof(GenderOptions), ErrorMessage = "[Users] Gender value is invalid")]
+	public GenderOptions? Gender { get; set; }
+	public CountryResponse? Country { get; set; }
+	public string? Address { get; set; }
+	public bool ReceiveNewsLetters { get; set; }
+
+	public User ToEntity() =>
+		new()
+		{
+			Name = Name,
+			Email = Email,
+			DateOfBirth = DateOfBirth,
+			Gender = Gender?.ToString(),
+			CountryId = Country?.Id,
+			Address = Address,
+			ReceiveNewsLetters = ReceiveNewsLetters,
+		};
+}

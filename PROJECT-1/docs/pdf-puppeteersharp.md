@@ -29,12 +29,12 @@
 
 ## 2. 만들 파일
 
-현재 계층 구조(`PersonManager.Api → Services → ServiceContracts → Entities`)에 맞춰 나눕니다.
+현재 계층 구조(`PersonManager.Api → PersonManager.Services → PersonManager.ServiceContracts → PersonManager.Entities`)에 맞춰 나눕니다.
 
 | 파일 | 프로젝트 | 역할 |
 |---|---|---|
-| `ServiceContracts/Common/Pdf/IPdfGenerator.cs` | ServiceContracts | HTML → PDF 변환 인터페이스 |
-| `Services/Common/Pdf/PuppeteerPdfGenerator.cs` | Services | PuppeteerSharp로 구현 |
+| `PersonManager.ServiceContracts/Common/Pdf/IPdfGenerator.cs` | PersonManager.ServiceContracts | HTML → PDF 변환 인터페이스 |
+| `PersonManager.Services/Common/Pdf/PuppeteerPdfGenerator.cs` | PersonManager.Services | PuppeteerSharp로 구현 |
 | `PersonManager.Api/Common/Templates/RazorTemplateRenderer.cs` | Api | Razor 컴포넌트 → HTML 문자열 |
 | `PersonManager.Api/Templates/_Imports.razor` | Api | 템플릿 공통 `@using` |
 | `PersonManager.Api/Templates/Users/UsersReport.razor` | Api | 사용자 목록 PDF 템플릿 |
@@ -47,13 +47,13 @@
 
 ## 3. 설치
 
-PuppeteerSharp는 **Services 프로젝트에만** 설치합니다.
+PuppeteerSharp는 **PersonManager.Services 프로젝트에만** 설치합니다.
 
 ```bash
-dotnet add Services/Services.csproj package PuppeteerSharp
+dotnet add PersonManager.Services/PersonManager.Services.csproj package PuppeteerSharp
 ```
 
-설치 후 `Services/Services.csproj`에 아래 항목이 추가됩니다. (2026-10-08 기준 최신 안정 버전은 `25.12.0`)
+설치 후 `PersonManager.Services/PersonManager.Services.csproj`에 아래 항목이 추가됩니다. (2026-10-08 기준 최신 안정 버전은 `25.12.0`)
 
 ```xml
 <ItemGroup>
@@ -67,10 +67,10 @@ dotnet add Services/Services.csproj package PuppeteerSharp
 
 ## 4. 코드 적용
 
-### 4-1. 인터페이스 — `ServiceContracts/Common/Pdf/IPdfGenerator.cs`
+### 4-1. 인터페이스 — `PersonManager.ServiceContracts/Common/Pdf/IPdfGenerator.cs`
 
 ```csharp
-namespace ServiceContracts.Common.Pdf;
+namespace PersonManager.ServiceContracts.Common.Pdf;
 
 /// <summary>
 /// HTML 을 PDF 로 변환
@@ -81,14 +81,14 @@ public interface IPdfGenerator
 }
 ```
 
-### 4-2. 구현 — `Services/Common/Pdf/PuppeteerPdfGenerator.cs`
+### 4-2. 구현 — `PersonManager.Services/Common/Pdf/PuppeteerPdfGenerator.cs`
 
 ```csharp
 using PuppeteerSharp;
 using PuppeteerSharp.Media;
-using ServiceContracts.Common.Pdf;
+using PersonManager.ServiceContracts.Common.Pdf;
 
-namespace Services.Common.Pdf;
+namespace PersonManager.Services.Common.Pdf;
 
 /// <summary>
 /// HTML 을 headless Chrome 으로 렌더링해서 PDF 로 변환
@@ -206,7 +206,7 @@ public class RazorTemplateRenderer(IServiceProvider _serviceProvider, ILoggerFac
 
 ```razor
 @using Microsoft.AspNetCore.Components
-@using ServiceContracts.Modules.Users.Dtos
+@using PersonManager.ServiceContracts.Modules.Users.Dtos
 ```
 
 ### 4-5. 템플릿 — `PersonManager.Api/Templates/Users/UsersReport.razor`
@@ -280,8 +280,8 @@ public class RazorTemplateRenderer(IServiceProvider _serviceProvider, ILoggerFac
 
 ```csharp
 using PersonManager.Api.Common.Templates;
-using ServiceContracts.Common.Pdf;
-using Services.Common.Pdf;
+using PersonManager.ServiceContracts.Common.Pdf;
+using PersonManager.Services.Common.Pdf;
 
 // ...
 
@@ -303,10 +303,10 @@ builder.Services.AddScoped<RazorTemplateRenderer>();
 using Microsoft.AspNetCore.Mvc;
 using PersonManager.Api.Common.Templates;
 using PersonManager.Api.Templates.Users;
-using ServiceContracts.Common.Dtos;
-using ServiceContracts.Common.Pdf;
-using ServiceContracts.Modules.Users;
-using ServiceContracts.Modules.Users.Dtos;
+using PersonManager.ServiceContracts.Common.Dtos;
+using PersonManager.ServiceContracts.Common.Pdf;
+using PersonManager.ServiceContracts.Modules.Users;
+using PersonManager.ServiceContracts.Modules.Users.Dtos;
 
 namespace PersonManager.Api.Controllers.Modules.Users
 {
@@ -435,9 +435,9 @@ macOS 로컬에서는 바로 동작하지만, Linux 컨테이너에서는 다음
 
 ## 9. 적용 체크리스트
 
-- [ ] `dotnet add Services/Services.csproj package PuppeteerSharp`
-- [ ] `IPdfGenerator` 추가 (ServiceContracts)
-- [ ] `PuppeteerPdfGenerator` 추가 (Services)
+- [ ] `dotnet add PersonManager.Services/PersonManager.Services.csproj package PuppeteerSharp`
+- [ ] `IPdfGenerator` 추가 (PersonManager.ServiceContracts)
+- [ ] `PuppeteerPdfGenerator` 추가 (PersonManager.Services)
 - [ ] `RazorTemplateRenderer` 추가 (Api)
 - [ ] `Templates/_Imports.razor`, `Templates/Users/UsersReport.razor` 추가 (Api)
 - [ ] `Program.cs`에 DI 등록 (`IPdfGenerator`는 Singleton)

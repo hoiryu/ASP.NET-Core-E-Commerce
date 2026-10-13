@@ -1,7 +1,7 @@
 using Gridify;
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Modules.Users;
-using ServiceContracts.Modules.Users.Dtos;
+using PersonManager.ServiceContracts.Modules.Users;
+using PersonManager.ServiceContracts.Modules.Users.Dtos;
 
 namespace PersonManager.Api.Controllers.Modules.Users
 {

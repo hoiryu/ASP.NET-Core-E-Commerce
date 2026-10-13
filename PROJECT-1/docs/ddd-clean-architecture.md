@@ -10,15 +10,15 @@
 현재 솔루션 `PersonManager.slnx`는 프로젝트 4개로 된 전형적인 N-Layer 구조입니다.
 
 ```
-PersonManager.Api → Services → ServiceContracts → Entities
+PersonManager.Api → PersonManager.Services → PersonManager.ServiceContracts → PersonManager.Entities
 ```
 
 | 문제 | 위치 |
 |---|---|
-| 도메인 프로젝트(`Entities`)가 EF Core 패키지와 `AppDbContext`, 마이그레이션, Seed를 함께 가지고 있음. 도메인이 인프라에 의존함 | `Entities/Entities.csproj`, `Entities/Data/` |
-| 엔티티가 빈약함(anemic). public setter만 있어서 아무 값이나 넣을 수 있음 | `Entities/Modules/Users/User.cs`, `Entities/Modules/Countries/Country.cs` |
-| 규칙이 서비스와 DTO에 흩어져 있음. 이메일 형식은 DTO의 `[EmailAddress]`에서, 국가 존재 여부와 이름 중복은 서비스에서 검사함 | `Services/Modules/*/…Service.cs` |
-| DTO가 엔티티를 직접 만들어서 `ServiceContracts`가 `Entities`를 참조함 | `UserCreateRequest.ToEntity()`, `UserResponse`의 `ToResponse()` |
+| 도메인 프로젝트(`PersonManager.Entities`)가 EF Core 패키지와 `AppDbContext`, 마이그레이션, Seed를 함께 가지고 있음. 도메인이 인프라에 의존함 | `PersonManager.Entities/PersonManager.Entities.csproj`, `PersonManager.Entities/Data/` |
+| 엔티티가 빈약함(anemic). public setter만 있어서 아무 값이나 넣을 수 있음 | `PersonManager.Entities/Modules/Users/User.cs`, `PersonManager.Entities/Modules/Countries/Country.cs` |
+| 규칙이 서비스와 DTO에 흩어져 있음. 이메일 형식은 DTO의 `[EmailAddress]`에서, 국가 존재 여부와 이름 중복은 서비스에서 검사함 | `PersonManager.Services/Modules/*/…Service.cs` |
+| DTO가 엔티티를 직접 만들어서 `PersonManager.ServiceContracts`가 `PersonManager.Entities`를 참조함 | `UserCreateRequest.ToEntity()`, `UserResponse`의 `ToResponse()` |
 | `Gender`가 엔티티에서는 `string`이고 DTO에서는 `GenderOptions` enum이라 변환이 곳곳에 있음 | `UserQueryExtensions`, `UserExtensions` |
 
 ---
@@ -263,16 +263,16 @@ public class User
 
 | 현재 | 목표 |
 |---|---|
-| `Entities/Modules/Users/User.cs`, `Entities/Modules/Countries/Country.cs` | `src/PersonManager.Domain/{Users,Countries}/` (팩토리 + private setter) |
-| `ServiceContracts/Modules/Users/Enums/GenderOptions.cs` | `src/PersonManager.Domain/Users/Gender.cs` |
-| `Entities/Data/AppDbContext.cs`, `Data/Configurations/`, `Data/Seeds/` | `src/PersonManager.Infrastructure/Persistence/` |
-| `Entities/Migrations/` | `src/PersonManager.Infrastructure/Persistence/Migrations/` (namespace만 수정) |
-| `ServiceContracts/Common/*` | `src/PersonManager.Application/Common/*` |
-| `ServiceContracts/Modules/*` (인터페이스, DTO) | `src/PersonManager.Application/{Users,Countries}/` |
-| `Services/Modules/*/…Service.cs` | `src/PersonManager.Application/{Users,Countries}/` |
-| `Services/Modules/*/Extensions/*QueryExtensions.cs` | `src/PersonManager.Application/{Users,Countries}/Extensions/` |
-| `Services/Common/Extensions/QueryableExtensions.cs` | `src/PersonManager.Application/Common/Extensions/` |
-| `Services/Common/Helpers/ValidationHelper.cs` | `src/PersonManager.Application/Common/Helpers/` |
+| `PersonManager.Entities/Modules/Users/User.cs`, `PersonManager.Entities/Modules/Countries/Country.cs` | `src/PersonManager.Domain/{Users,Countries}/` (팩토리 + private setter) |
+| `PersonManager.ServiceContracts/Modules/Users/Enums/GenderOptions.cs` | `src/PersonManager.Domain/Users/Gender.cs` |
+| `PersonManager.Entities/Data/AppDbContext.cs`, `Data/Configurations/`, `Data/Seeds/` | `src/PersonManager.Infrastructure/Persistence/` |
+| `PersonManager.Entities/Migrations/` | `src/PersonManager.Infrastructure/Persistence/Migrations/` (namespace만 수정) |
+| `PersonManager.ServiceContracts/Common/*` | `src/PersonManager.Application/Common/*` |
+| `PersonManager.ServiceContracts/Modules/*` (인터페이스, DTO) | `src/PersonManager.Application/{Users,Countries}/` |
+| `PersonManager.Services/Modules/*/…Service.cs` | `src/PersonManager.Application/{Users,Countries}/` |
+| `PersonManager.Services/Modules/*/Extensions/*QueryExtensions.cs` | `src/PersonManager.Application/{Users,Countries}/Extensions/` |
+| `PersonManager.Services/Common/Extensions/QueryableExtensions.cs` | `src/PersonManager.Application/Common/Extensions/` |
+| `PersonManager.Services/Common/Helpers/ValidationHelper.cs` | `src/PersonManager.Application/Common/Helpers/` |
 | DTO 안의 `ToEntity()` / `ToResponse()` | `src/PersonManager.Application/{Users,Countries}/Mappings.cs` |
 | `Program.cs`의 수동 DI + `AddDbContext` | `AddApplication()` / `AddInfrastructure(config)` |
 
@@ -286,9 +286,9 @@ public class User
 4. **Infrastructure**: `AppDbContext`(`IApplicationDbContext` 구현), Configurations, Seeds, Migrations를 옮기고 namespace를 수정합니다. `AddInfrastructure()`를 작성합니다.
    - 마이그레이션은 **새로 만들지 않습니다**(이미 DB에 적용됨). 마이그레이션 Id가 그대로면 `__EFMigrationsHistory`와 맞습니다.
 5. **Api**: `Program.cs`를 정리하고 컨트롤러 using을 수정하고 예외 미들웨어를 추가합니다(`DomainException`/`ArgumentException`은 400).
-6. 기존 `Entities/`, `ServiceContracts/`, `Services/` 폴더를 삭제합니다.
+6. 기존 `PersonManager.Entities/`, `PersonManager.ServiceContracts/`, `PersonManager.Services/` 폴더를 삭제합니다.
 7. 경로를 수정합니다.
-   - `.vscode/tasks.json`: `--project Entities --startup-project PersonManager.Api` → `--project src/PersonManager.Infrastructure --startup-project src/PersonManager.Api`
+   - `.vscode/tasks.json`: `--project PersonManager.Entities --startup-project PersonManager.Api` → `--project src/PersonManager.Infrastructure --startup-project src/PersonManager.Api`
    - 상위 `README.md` EF 명령어 표의 설명
    - `PersonManager.Infrastructure.csproj`에 `Seeds/*.json`의 `CopyToOutputDirectory`를 옮김
 8. (선택) 서비스와 컨트롤러를 `async`로 바꿉니다.

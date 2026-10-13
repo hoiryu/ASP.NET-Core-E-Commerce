@@ -21,8 +21,8 @@
 
 | API | 필드 | 정의 위치 |
 |---|---|---|
-| `/api/countries` | `id`, `name` | `Repositories/Modules/Countries/CountriesRepository.cs` |
-| `/api/users` | `id`, `name`, `email`, `dateOfBirth`, `gender`, `address`, `receiveNewsLetters`, `country.id`, `country.name` | `Repositories/Modules/Users/UsersRepository.cs` |
+| `/api/countries` | `id`, `name` | `PersonManager.Repositories/Modules/Countries/CountriesRepository.cs` |
+| `/api/users` | `id`, `name`, `email`, `dateOfBirth`, `gender`, `address`, `receiveNewsLetters`, `country.id`, `country.name` | `PersonManager.Repositories/Modules/Users/UsersRepository.cs` |
 
 등록되지 않은 필드를 쓰면 `ArgumentException: Field 'xxx' is not mapped` 가 난다.
 필드를 추가하거나 바꾸면 mapper 와 이 문서를 함께 수정한다.
@@ -78,7 +78,7 @@ orderBy=country.name, name desc     여러 개는 쉼표로, 앞쪽이 우선
 ## 특수문자 이스케이프
 
 값 안의 `, | ( ) \ /i` 앞에는 `\` 를 붙인다. 예: `filter=name=Smoke\,\(Land\)` → 값 `Smoke,(Land)`.
-서버 코드에서 사용자 입력을 필터 값으로 넣을 때는 `Services/Common/Helpers/GridifyHelper.Escape()` 를 쓴다.
+서버 코드에서 사용자 입력을 필터 값으로 넣을 때는 `PersonManager.Services/Common/Helpers/GridifyHelper.Escape()` 를 쓴다.
 
 ## URL 인코딩
 

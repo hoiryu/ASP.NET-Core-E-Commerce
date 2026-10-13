@@ -1,7 +1,7 @@
 using Gridify;
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Modules.Countries;
-using ServiceContracts.Modules.Countries.Dtos;
+using PersonManager.ServiceContracts.Modules.Countries;
+using PersonManager.ServiceContracts.Modules.Countries.Dtos;
 
 namespace PersonManager.Api.Controllers.Modules.Countries
 {
