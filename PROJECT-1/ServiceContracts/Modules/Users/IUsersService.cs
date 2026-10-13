@@ -1,4 +1,4 @@
-using ServiceContracts.Common.Dtos;
+using Gridify;
 using ServiceContracts.Modules.Users.Dtos;
 
 namespace ServiceContracts.Modules.Users;
@@ -7,7 +7,7 @@ public interface IUsersService
 {
 	Task<UserResponse> CreateUser(UserCreateRequest? userCreateRequest);
 
-	Task<List<UserResponse>> GetUsers(UserFilter filter, UserOrder order, Paging paging);
+	Task<Paging<UserResponse>> GetUsers(GridifyQuery query);
 
 	Task<UserResponse?> UpdateUser(UserUpdateRequest? userUpdateRequest);
 

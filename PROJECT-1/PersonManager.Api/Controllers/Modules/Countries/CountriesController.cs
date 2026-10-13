@@ -1,5 +1,5 @@
+using Gridify;
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Countries.Dtos;
 
@@ -9,19 +9,16 @@ namespace PersonManager.Api.Controllers.Modules.Countries
 	[ApiController]
 	public class CountriesController(ICountriesService _countriesService) : ControllerBase
 	{
+		[HttpPost]
 		public async Task<ActionResult<CountryResponse>> CreateCountry([FromBody] CountryCreateRequest countryCreateRequest)
 		{
 			return await _countriesService.CreateCountry(countryCreateRequest);
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<List<CountryResponse>>> GetCountries(
-			[FromQuery] CountryFilter filter,
-			[FromQuery(Name = "order")] CountryOrder order,
-			[FromQuery] Paging paging
-		)
+		public async Task<ActionResult<Paging<CountryResponse>>> GetCountries([FromQuery] GridifyQuery query)
 		{
-			return await _countriesService.GetCountries(filter, order, paging);
+			return await _countriesService.GetCountries(query);
 		}
 
 		[HttpPatch("{countryId:guid}")]

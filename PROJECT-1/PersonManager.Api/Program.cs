@@ -1,6 +1,11 @@
 using System.Text.Json.Serialization;
 using Entities.Data;
+using Gridify;
 using Microsoft.EntityFrameworkCore;
+using Repositories.Modules.Countries;
+using Repositories.Modules.Users;
+using RepositoryContracts.Modules.Countries;
+using RepositoryContracts.Modules.Users;
 using ServiceContracts.Modules.Countries;
 using ServiceContracts.Modules.Users;
 using Services.Modules.Countries;
@@ -21,8 +26,14 @@ builder.Services.AddRouting(o => o.LowercaseUrls = true);
 // builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
 #region Register with IoC Container
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICountriesService, CountriesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+#endregion
+
+#region Gridify
+GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer(); // EF Core 에서 필터 값을 SQL 파라미터로 전달
 #endregion
 
 #region Register DbContext

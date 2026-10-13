@@ -1,4 +1,4 @@
-﻿using ServiceContracts.Common.Dtos;
+﻿using Gridify;
 using ServiceContracts.Modules.Countries.Dtos;
 
 namespace ServiceContracts.Modules.Countries;
@@ -10,7 +10,7 @@ public interface ICountriesService
 {
 	Task<CountryResponse> CreateCountry(CountryCreateRequest? countryCreateRequest);
 
-	Task<List<CountryResponse>> GetCountries(CountryFilter filter, CountryOrder order, Paging paging);
+	Task<Paging<CountryResponse>> GetCountries(GridifyQuery query);
 
 	Task<CountryResponse?> UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
 

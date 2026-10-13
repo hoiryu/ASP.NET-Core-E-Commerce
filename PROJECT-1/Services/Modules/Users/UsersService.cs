@@ -1,16 +1,14 @@
-using Entities.Data;
 using Entities.Modules.Users;
-using Microsoft.EntityFrameworkCore;
-using ServiceContracts.Common.Dtos;
+using Gridify;
+using RepositoryContracts.Modules.Countries;
+using RepositoryContracts.Modules.Users;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
-using Services.Common.Extensions;
 using Services.Common.Helpers;
-using Services.Modules.Users.Extensions;
 
 namespace Services.Modules.Users;
 
-public class UsersService(AppDbContext _db) : IUsersService
+public class UsersService(IUsersRepository _usersRepository, ICountriesRepository _countriesRepository) : IUsersService
 {
 	public async Task<UserResponse> CreateUser(UserCreateRequest? userCreateRequest)
 	{
@@ -20,29 +18,20 @@ public class UsersService(AppDbContext _db) : IUsersService
 
 		if (
 			userCreateRequest.Country?.Id is Guid countryId
-			&& !await _db.Countries.AnyAsync(temp => temp.Id == countryId)
+			&& (await _countriesRepository.GetCountries(new GridifyQuery { Filter = $"id={countryId}", PageSize = 1 })).Count == 0
 		)
 			throw new ArgumentException("Given country id doesn't exist");
 
-		User user = userCreateRequest.ToEntity();
-
-		_db.Users.Add(user);
-		await _db.SaveChangesAsync();
-
-		// 응답에 Country 를 담기 위해 내비게이션 속성 로드
-		await _db.Entry(user).Reference(temp => temp.Country).LoadAsync();
+		User user = await _usersRepository.CreateUser(userCreateRequest.ToEntity());
 
 		return user.ToResponse();
 	}
 
-	public async Task<List<UserResponse>> GetUsers(UserFilter filter, UserOrder order, Paging paging)
+	public async Task<Paging<UserResponse>> GetUsers(GridifyQuery query)
 	{
-		IQueryable<User> users = _db.Users.Include(temp => temp.Country);
+		Paging<User> users = await _usersRepository.GetUsers(query);
 
-		users = users.ApplyFiltering(filter).ApplyOrdering(order).ApplyPaging(paging);
-
-		// 여기서 SQL 실행 (JOIN + WHERE + ORDER BY + OFFSET/FETCH 포함)
-		return await users.Select(user => user.ToResponse()).ToListAsync();
+		return new Paging<UserResponse>(users.Count, users.Data.Select(user => user.ToResponse()));
 	}
 
 	public async Task<UserResponse?> UpdateUser(UserUpdateRequest? userUpdateRequest)
@@ -53,13 +42,13 @@ public class UsersService(AppDbContext _db) : IUsersService
 
 		if (
 			userUpdateRequest.Country?.Id is Guid countryId
-			&& !await _db.Countries.AnyAsync(temp => temp.Id == countryId)
+			&& (await _countriesRepository.GetCountries(new GridifyQuery { Filter = $"id={countryId}", PageSize = 1 })).Count == 0
 		)
 			throw new ArgumentException("Given country id doesn't exist");
 
-		User? matchingUser = await _db
-			.Users.Include(temp => temp.Country)
-			.FirstOrDefaultAsync(temp => temp.Id == userUpdateRequest.Id);
+		User? matchingUser = (
+			await _usersRepository.GetUsers(new GridifyQuery { Filter = $"id={userUpdateRequest.Id}", PageSize = 1 })
+		).Data.FirstOrDefault();
 
 		if (matchingUser == null)
 			return null;
@@ -73,13 +62,9 @@ public class UsersService(AppDbContext _db) : IUsersService
 		matchingUser.Address = userUpdateRequest.Address ?? matchingUser.Address;
 		matchingUser.ReceiveNewsLetters = userUpdateRequest.ReceiveNewsLetters ?? matchingUser.ReceiveNewsLetters;
 
-		// 변경 감지된 컬럼만 UPDATE
-		await _db.SaveChangesAsync();
+		User updatedUser = await _usersRepository.UpdateUser(matchingUser);
 
-		// CountryId 가 바뀌었을 수 있으므로 Country 다시 로드
-		await _db.Entry(matchingUser).Reference(temp => temp.Country).LoadAsync();
-
-		return matchingUser.ToResponse();
+		return updatedUser.ToResponse();
 	}
 
 	public async Task<UserResponse?> DeleteUser(Guid? userId)
@@ -89,16 +74,8 @@ public class UsersService(AppDbContext _db) : IUsersService
 			throw new ArgumentNullException(nameof(userId));
 		}
 
-		User? matchingUser = await _db
-			.Users.Include(temp => temp.Country)
-			.FirstOrDefaultAsync(temp => temp.Id == userId);
+		User? deletedUser = await _usersRepository.DeleteUser(userId.Value);
 
-		if (matchingUser == null)
-			return null;
-
-		_db.Users.Remove(matchingUser);
-		await _db.SaveChangesAsync();
-
-		return matchingUser.ToResponse();
+		return deletedUser?.ToResponse();
 	}
 }

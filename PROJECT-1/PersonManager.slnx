@@ -1,6 +1,8 @@
 <Solution>
   <Project Path="Entities/Entities.csproj" />
   <Project Path="PersonManager.Api/PersonManager.Api.csproj" />
+  <Project Path="Repositories/Repositories.csproj" />
+  <Project Path="RepositoryContracts/RepositoryContracts.csproj" />
   <Project Path="ServiceContracts/ServiceContracts.csproj" />
   <Project Path="Services/Services.csproj" />
 </Solution>

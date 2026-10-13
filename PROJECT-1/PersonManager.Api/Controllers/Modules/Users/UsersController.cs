@@ -1,5 +1,5 @@
+using Gridify;
 using Microsoft.AspNetCore.Mvc;
-using ServiceContracts.Common.Dtos;
 using ServiceContracts.Modules.Users;
 using ServiceContracts.Modules.Users.Dtos;
 
@@ -16,13 +16,9 @@ namespace PersonManager.Api.Controllers.Modules.Users
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<List<UserResponse>>> GetUsers(
-			[FromQuery(Name = "filter")] UserFilter filter,
-			[FromQuery(Name = "order")] UserOrder order,
-			[FromQuery(Name = "paging")] Paging paging
-		)
+		public async Task<ActionResult<Paging<UserResponse>>> GetUsers([FromQuery] GridifyQuery query)
 		{
-			return await _usersService.GetUsers(filter, order, paging);
+			return await _usersService.GetUsers(query);
 		}
 
 		[HttpPatch("{userId:guid}")]
