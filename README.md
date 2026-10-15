@@ -25,13 +25,13 @@ VS Code 유저 설정(`Ctrl+Shift+P` → `Open User Settings (JSON)`)에 아래 
 
 각 프로젝트 폴더(`PROJECT-*`)를 VS Code로 열고 `Ctrl+Shift+P` → `Tasks: Run Task`에서 실행 (각 프로젝트의 `.vscode/tasks.json`에 정의)
 
-| Task                              | 명령어                                                                                                  |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| EF: Add Migration                 | `dotnet ef migrations add <이름> --project <Entities> --startup-project <Api>`                |
-| EF: Update Database               | `dotnet ef database update --project <Entities> --startup-project <Api>`                      |
-| EF: Update Database To Migration  | `dotnet ef database update <대상> --project <Entities> --startup-project <Api>`               |
-| EF: Remove Last Migration         | `dotnet ef migrations remove --project <Entities> --startup-project <Api>`                    |
-| EF: List Migrations               | `dotnet ef migrations list --project <Entities> --startup-project <Api>`                      |
-| EF: Check Pending Model Changes   | `dotnet ef migrations has-pending-model-changes --project <Entities> --startup-project <Api>` |
+| Task                             | 명령어                                                                                        | 설명                                   |
+| -------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------- |
+| EF: Add Migration                | `dotnet ef migrations add <이름> --project <Entities> --startup-project <Api>`                | 모델 변경분으로 마이그레이션 파일 생성 |
+| EF: Update Database              | `dotnet ef database update --project <Entities> --startup-project <Api>`                      | 미적용 마이그레이션을 DB 에 적용       |
+| EF: Update Database To Migration | `dotnet ef database update <대상> --project <Entities> --startup-project <Api>`               | 지정한 마이그레이션 시점으로 DB 되돌림 |
+| EF: Remove Last Migration        | `dotnet ef migrations remove --project <Entities> --startup-project <Api>`                    | 미적용 마지막 마이그레이션 파일 삭제   |
+| EF: List Migrations              | `dotnet ef migrations list --project <Entities> --startup-project <Api>`                      | 마이그레이션 목록과 적용 여부 표시     |
+| EF: Check Pending Model Changes  | `dotnet ef migrations has-pending-model-changes --project <Entities> --startup-project <Api>` | 마이그레이션 안 만든 모델 변경 확인    |
 
 > `<Entities>`: DbContext·마이그레이션이 있는 프로젝트, `<Api>`: 설정(연결 문자열)을 읽는 시작 프로젝트
