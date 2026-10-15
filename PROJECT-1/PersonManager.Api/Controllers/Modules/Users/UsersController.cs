@@ -21,31 +21,33 @@ namespace PersonManager.Api.Controllers.Modules.Users
 			return await _usersService.GetUsers(query);
 		}
 
-		[HttpPatch("{userId:guid}")]
-		public async Task<ActionResult<UserResponse>> UpdateUser(
-			[FromRoute] Guid userId,
+		/// <summary>
+		/// filter 에 맞는 사용자 일괄 수정 (orderBy·page·pageSize 는 무시)
+		/// </summary>
+		[HttpPatch]
+		public async Task<ActionResult<object>> UpdateUsers(
+			[FromQuery] GridifyQuery query,
 			[FromBody] UserUpdateRequest userUpdateRequest
 		)
 		{
-			userUpdateRequest.Id = userId;
+			// 빈 filter 는 전체 행이 대상이 되므로 거부
+			if (string.IsNullOrWhiteSpace(query.Filter))
+				return BadRequest("Filter is required");
 
-			UserResponse? userResponse = await _usersService.UpdateUser(userUpdateRequest);
-
-			if (userResponse is null)
-				return NotFound();
-
-			return userResponse;
+			return new { count = await _usersService.UpdateUsers(query.Filter, userUpdateRequest) };
 		}
 
-		[HttpDelete("{userId:guid}")]
-		public async Task<ActionResult<UserResponse>> DeleteUser([FromRoute] Guid userId)
+		/// <summary>
+		/// filter 에 맞는 사용자 일괄 삭제 (orderBy·page·pageSize 는 무시)
+		/// </summary>
+		[HttpDelete]
+		public async Task<ActionResult<object>> DeleteUsers([FromQuery] GridifyQuery query)
 		{
-			UserResponse? userResponse = await _usersService.DeleteUser(userId);
+			// 빈 filter 는 전체 행이 대상이 되므로 거부
+			if (string.IsNullOrWhiteSpace(query.Filter))
+				return BadRequest("Filter is required");
 
-			if (userResponse is null)
-				return NotFound();
-
-			return userResponse;
+			return new { count = await _usersService.DeleteUsers(query.Filter) };
 		}
 	}
 }

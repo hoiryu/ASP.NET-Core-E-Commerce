@@ -19,7 +19,7 @@ PersonManager.Api → PersonManager.Services → PersonManager.ServiceContracts 
 | 엔티티가 빈약함(anemic). public setter만 있어서 아무 값이나 넣을 수 있음 | `PersonManager.Entities/Modules/Users/User.cs`, `PersonManager.Entities/Modules/Countries/Country.cs` |
 | 규칙이 서비스와 DTO에 흩어져 있음. 이메일 형식은 DTO의 `[EmailAddress]`에서, 국가 존재 여부와 이름 중복은 서비스에서 검사함 | `PersonManager.Services/Modules/*/…Service.cs` |
 | DTO가 엔티티를 직접 만들어서 `PersonManager.ServiceContracts`가 `PersonManager.Entities`를 참조함 | `UserCreateRequest.ToEntity()`, `UserResponse`의 `ToResponse()` |
-| `Gender`가 엔티티에서는 `string`이고 DTO에서는 `GenderOptions` enum이라 변환이 곳곳에 있음 | `UserQueryExtensions`, `UserExtensions` |
+| `Gender`가 엔티티에서는 `string`이고 DTO에서는 `GenderOptions` enum이라 변환이 곳곳에 있음 | `UserQueryExtensions`, `UserMappings` |
 
 ---
 

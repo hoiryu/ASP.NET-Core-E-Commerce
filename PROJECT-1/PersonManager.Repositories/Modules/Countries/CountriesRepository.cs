@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PersonManager.Entities.Data;
 using PersonManager.Entities.Modules.Countries;
 using PersonManager.RepositoryContracts.Modules.Countries;
+using PersonManager.RepositoryContracts.Modules.Countries.Dtos;
 
 namespace PersonManager.Repositories.Modules.Countries;
 
@@ -33,11 +34,6 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 		return await _db.Countries.AsNoTracking().GridifyAsync(query, _mapper);
 	}
 
-	public async Task<Country?> GetCountryById(Guid countryId)
-	{
-		return await _db.Countries.FirstOrDefaultAsync(temp => temp.Id == countryId);
-	}
-
 	/// <summary>
 	/// 엔티티를 불러오지 않고 EXISTS 쿼리 한 번으로 확인
 	/// </summary>
@@ -55,24 +51,42 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 	}
 
 	/// <summary>
-	/// 같은 DbContext 에서 조회해 추적 중인 엔티티를 받아 변경 사항만 저장 (재조회하지 않음)
+	/// filter 에 맞는 행을 엔티티 로드 없이 UPDATE 한 번으로 수정하고 영향받은 행 수 반환
 	/// </summary>
-	public async Task<Country> UpdateCountry(Country country)
+	public async Task<int> UpdateCountries(string filter, CountryUpdate values)
 	{
-		await _db.SaveChangesAsync();
+		ValidateFilter(filter);
 
-		return country;
+		// null 이 아닌 값만 SET
+		return await _db
+			.Countries.ApplyFiltering(filter, _mapper)
+			.ExecuteUpdateAsync(setters =>
+			{
+				if (values.Name is not null)
+					setters.SetProperty(temp => temp.Name, values.Name);
+			});
 	}
 
 	/// <summary>
-	/// 같은 DbContext 에서 조회해 추적 중인 엔티티를 받아 삭제 (재조회하지 않음)
+	/// filter 에 맞는 행을 엔티티 로드 없이 DELETE 한 번으로 삭제하고 영향받은 행 수 반환
 	/// </summary>
-	public async Task<Country> DeleteCountry(Country country)
+	public async Task<int> DeleteCountries(string filter)
 	{
 		// 참조하는 User 의 CountryId 는 DB FK(ON DELETE SET NULL) 가 null 로 변경
-		_db.Countries.Remove(country);
-		await _db.SaveChangesAsync();
+		ValidateFilter(filter);
 
-		return country;
+		return await _db.Countries.ApplyFiltering(filter, _mapper).ExecuteDeleteAsync();
+	}
+
+	/// <summary>
+	/// 빈 filter 는 전체 행이 대상이 되므로 거부
+	/// </summary>
+	private static void ValidateFilter(string filter)
+	{
+		if (string.IsNullOrWhiteSpace(filter))
+			throw new ArgumentException("Filter is required for bulk operations");
+
+		if (!new GridifyQuery { Filter = filter }.IsValid(out var errors, _mapper))
+			throw new ArgumentException(string.Join(", ", errors));
 	}
 }

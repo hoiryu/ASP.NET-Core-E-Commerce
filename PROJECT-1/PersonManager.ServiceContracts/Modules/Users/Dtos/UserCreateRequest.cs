@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using PersonManager.Entities.Modules.Users;
 using PersonManager.ServiceContracts.Modules.Countries.Dtos;
 using PersonManager.ServiceContracts.Modules.Users.Enums;
 
@@ -20,16 +19,4 @@ public record UserCreateRequest
 	public CountryResponse? Country { get; set; }
 	public string? Address { get; set; }
 	public bool ReceiveNewsLetters { get; set; }
-
-	public User ToEntity() =>
-		new()
-		{
-			Name = Name,
-			Email = Email,
-			DateOfBirth = DateOfBirth,
-			Gender = Gender?.ToString(),
-			CountryId = Country?.Id,
-			Address = Address,
-			ReceiveNewsLetters = ReceiveNewsLetters,
-		};
 }

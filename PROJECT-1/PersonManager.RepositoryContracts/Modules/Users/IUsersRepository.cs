@@ -1,5 +1,6 @@
 using PersonManager.Entities.Modules.Users;
 using Gridify;
+using PersonManager.RepositoryContracts.Modules.Users.Dtos;
 
 namespace PersonManager.RepositoryContracts.Modules.Users;
 
@@ -9,9 +10,7 @@ public interface IUsersRepository
 
 	Task<Paging<User>> GetUsers(GridifyQuery query);
 
-	Task<User?> GetUserById(Guid userId);
+	Task<int> UpdateUsers(string filter, UserUpdate values);
 
-	Task<User> UpdateUser(User user);
-
-	Task<User> DeleteUser(User user);
+	Task<int> DeleteUsers(string filter);
 }

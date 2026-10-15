@@ -12,7 +12,7 @@ public interface ICountriesService
 
 	Task<Paging<CountryResponse>> GetCountries(GridifyQuery query);
 
-	Task<CountryResponse?> UpdateCountry(CountryUpdateRequest? countryUpdateRequest);
+	Task<int> UpdateCountries(string? filter, CountryUpdateRequest? countryUpdateRequest);
 
-	Task<CountryResponse?> DeleteCountry(Guid? countryId);
+	Task<int> DeleteCountries(string? filter);
 }

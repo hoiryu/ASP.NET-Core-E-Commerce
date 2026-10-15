@@ -6,8 +6,6 @@ namespace PersonManager.ServiceContracts.Modules.Users.Dtos;
 
 public class UserUpdateRequest
 {
-	public Guid Id { get; set; }
-
 	[MinLength(1, ErrorMessage = "[Users] Name can't be blank")]
 	public string? Name { get; set; }
 

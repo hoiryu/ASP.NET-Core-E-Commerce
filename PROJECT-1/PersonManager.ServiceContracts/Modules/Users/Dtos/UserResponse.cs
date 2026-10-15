@@ -1,4 +1,3 @@
-using PersonManager.Entities.Modules.Users;
 using PersonManager.ServiceContracts.Modules.Countries.Dtos;
 using PersonManager.ServiceContracts.Modules.Users.Enums;
 
@@ -20,21 +19,4 @@ public record UserResponse
 	{
 		return $"User Id: {Id}, Name: {Name}, Email: {Email}, DateOfBirth: {DateOfBirth}, Gender: {Gender}, Country: {Country}";
 	}
-}
-
-public static class UserExtensions
-{
-	public static UserResponse ToResponse(this User user) =>
-		new()
-		{
-			Id = user.Id,
-			Name = user.Name,
-			Email = user.Email,
-			DateOfBirth = user.DateOfBirth,
-			Country = user.Country?.ToResponse(),
-			Gender = Enum.TryParse<GenderOptions>(user.Gender, out var gender) ? gender : null,
-			Address = user.Address,
-			ReceiveNewsLetters = user.ReceiveNewsLetters,
-			Age = (user.DateOfBirth != null) ? ((DateTime.Now - user.DateOfBirth.Value).TotalDays / 365.25) : null,
-		};
 }

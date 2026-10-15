@@ -1,5 +1,6 @@
 using PersonManager.Entities.Modules.Countries;
 using Gridify;
+using PersonManager.RepositoryContracts.Modules.Countries.Dtos;
 
 namespace PersonManager.RepositoryContracts.Modules.Countries;
 
@@ -9,13 +10,11 @@ public interface ICountriesRepository
 
 	Task<Paging<Country>> GetCountries(GridifyQuery query);
 
-	Task<Country?> GetCountryById(Guid countryId);
-
 	Task<bool> ExistsCountryById(Guid countryId);
 
 	Task<bool> ExistsCountryByName(string name);
 
-	Task<Country> UpdateCountry(Country country);
+	Task<int> UpdateCountries(string filter, CountryUpdate values);
 
-	Task<Country> DeleteCountry(Country country);
+	Task<int> DeleteCountries(string filter);
 }

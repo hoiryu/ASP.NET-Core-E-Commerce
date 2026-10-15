@@ -106,3 +106,32 @@ GET /api/countries?filter=name=Korea
 # T 로 시작하는 국가, 이름 역순
 GET /api/countries?filter=name^T&orderBy=name desc
 ```
+
+## 수정·삭제
+
+수정·삭제는 `filter` 로 대상을 고르는 엔드포인트 하나뿐이다. 한 건만 바꾸려면 `filter=id=<guid>` 를 쓴다. `orderBy`·`page`·`pageSize` 는 무시하고, 응답은 `{ "count": <영향받은 행 수> }` 이다.
+
+```
+PATCH  /api/users?filter=<조건>       body: UserUpdateRequest (null 필드는 변경 안 함)
+DELETE /api/users?filter=<조건>
+PATCH  /api/countries?filter=<조건>   body: CountryUpdateRequest
+DELETE /api/countries?filter=<조건>   (참조하는 User 의 country 는 null 로 변경)
+```
+
+- `filter` 가 비면 400 (전체 행 수정·삭제 방지)
+- `email` 을 바꿀 때 대상이 여러 행이면 유니크 인덱스 위반으로 UPDATE 전체가 실패한다
+- `ExecuteUpdateAsync`/`ExecuteDeleteAsync` 로 SQL 한 번에 실행하며 `SaveChanges` 를 거치지 않는다
+
+```
+# 한 건 수정
+PATCH /api/users?filter=id=00000000-0000-0000-0000-000000000001   {"name": "Kim"}
+
+# 한국 사용자 전원 뉴스레터 구독
+PATCH /api/users?filter=country.name=Korea   {"receiveNewsLetters": true}
+
+# 주소가 없는 사용자 삭제
+DELETE /api/users?filter=address=null
+
+# T 로 시작하는 국가 삭제
+DELETE /api/countries?filter=name^T
+```

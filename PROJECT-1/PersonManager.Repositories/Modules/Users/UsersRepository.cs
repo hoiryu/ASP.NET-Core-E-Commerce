@@ -4,6 +4,7 @@ using Gridify;
 using Gridify.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using PersonManager.RepositoryContracts.Modules.Users;
+using PersonManager.RepositoryContracts.Modules.Users.Dtos;
 
 namespace PersonManager.Repositories.Modules.Users;
 
@@ -43,33 +44,55 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 		return await _db.Users.AsNoTracking().Include(temp => temp.Country).GridifyAsync(query, _mapper);
 	}
 
-	public async Task<User?> GetUserById(Guid userId)
+	/// <summary>
+	/// filter 에 맞는 행을 엔티티 로드 없이 UPDATE 한 번으로 수정하고 영향받은 행 수 반환
+	/// </summary>
+	public async Task<int> UpdateUsers(string filter, UserUpdate values)
 	{
-		return await _db.Users.Include(temp => temp.Country).FirstOrDefaultAsync(temp => temp.Id == userId);
+		ValidateFilter(filter);
+
+		// null 이 아닌 값만 SET
+		return await _db
+			.Users.ApplyFiltering(filter, _mapper)
+			.ExecuteUpdateAsync(setters =>
+			{
+				if (values.Name is not null)
+					setters.SetProperty(temp => temp.Name, values.Name);
+				// 여러 행이 대상이면 유니크 인덱스 위반으로 UPDATE 전체가 실패
+				if (values.Email is not null)
+					setters.SetProperty(temp => temp.Email, values.Email);
+				if (values.DateOfBirth is not null)
+					setters.SetProperty(temp => temp.DateOfBirth, values.DateOfBirth);
+				if (values.Gender is not null)
+					setters.SetProperty(temp => temp.Gender, values.Gender);
+				if (values.CountryId is not null)
+					setters.SetProperty(temp => temp.CountryId, values.CountryId);
+				if (values.Address is not null)
+					setters.SetProperty(temp => temp.Address, values.Address);
+				if (values.ReceiveNewsLetters is bool receiveNewsLetters)
+					setters.SetProperty(temp => temp.ReceiveNewsLetters, receiveNewsLetters);
+			});
 	}
 
 	/// <summary>
-	/// 같은 DbContext 에서 조회해 추적 중인 엔티티를 받아 변경 사항만 저장 (재조회하지 않음)
+	/// filter 에 맞는 행을 엔티티 로드 없이 DELETE 한 번으로 삭제하고 영향받은 행 수 반환
 	/// </summary>
-	public async Task<User> UpdateUser(User user)
+	public async Task<int> DeleteUsers(string filter)
 	{
-		// 변경 감지된 컬럼만 UPDATE
-		await _db.SaveChangesAsync();
+		ValidateFilter(filter);
 
-		// CountryId 가 바뀌었을 수 있으므로 Country 다시 로드
-		await _db.Entry(user).Reference(temp => temp.Country).LoadAsync();
-
-		return user;
+		return await _db.Users.ApplyFiltering(filter, _mapper).ExecuteDeleteAsync();
 	}
 
 	/// <summary>
-	/// 같은 DbContext 에서 조회해 추적 중인 엔티티를 받아 삭제 (재조회하지 않음)
+	/// 빈 filter 는 전체 행이 대상이 되므로 거부
 	/// </summary>
-	public async Task<User> DeleteUser(User user)
+	private static void ValidateFilter(string filter)
 	{
-		_db.Users.Remove(user);
-		await _db.SaveChangesAsync();
+		if (string.IsNullOrWhiteSpace(filter))
+			throw new ArgumentException("Filter is required for bulk operations");
 
-		return user;
+		if (!new GridifyQuery { Filter = filter }.IsValid(out var errors, _mapper))
+			throw new ArgumentException(string.Join(", ", errors));
 	}
 }

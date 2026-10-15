@@ -9,7 +9,7 @@ public interface IUsersService
 
 	Task<Paging<UserResponse>> GetUsers(GridifyQuery query);
 
-	Task<UserResponse?> UpdateUser(UserUpdateRequest? userUpdateRequest);
+	Task<int> UpdateUsers(string? filter, UserUpdateRequest? userUpdateRequest);
 
-	Task<UserResponse?> DeleteUser(Guid? userId);
+	Task<int> DeleteUsers(string? filter);
 }

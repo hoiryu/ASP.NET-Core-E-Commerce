@@ -21,31 +21,33 @@ namespace PersonManager.Api.Controllers.Modules.Countries
 			return await _countriesService.GetCountries(query);
 		}
 
-		[HttpPatch("{countryId:guid}")]
-		public async Task<ActionResult<CountryResponse?>> UpdateCountry(
-			[FromRoute] Guid countryId,
+		/// <summary>
+		/// filter 에 맞는 국가 일괄 수정 (orderBy·page·pageSize 는 무시)
+		/// </summary>
+		[HttpPatch]
+		public async Task<ActionResult<object>> UpdateCountries(
+			[FromQuery] GridifyQuery query,
 			[FromBody] CountryUpdateRequest countryUpdateRequest
 		)
 		{
-			countryUpdateRequest.Id = countryId;
+			// 빈 filter 는 전체 행이 대상이 되므로 거부
+			if (string.IsNullOrWhiteSpace(query.Filter))
+				return BadRequest("Filter is required");
 
-			CountryResponse? countryResponse = await _countriesService.UpdateCountry(countryUpdateRequest);
-
-			if (countryResponse is null)
-				return NotFound();
-
-			return countryResponse;
+			return new { count = await _countriesService.UpdateCountries(query.Filter, countryUpdateRequest) };
 		}
 
-		[HttpDelete("{countryId:guid}")]
-		public async Task<ActionResult<CountryResponse>> DeleteCountry([FromRoute] Guid countryId)
+		/// <summary>
+		/// filter 에 맞는 국가 일괄 삭제 (orderBy·page·pageSize 는 무시)
+		/// </summary>
+		[HttpDelete]
+		public async Task<ActionResult<object>> DeleteCountries([FromQuery] GridifyQuery query)
 		{
-			CountryResponse? countryResponse = await _countriesService.DeleteCountry(countryId);
+			// 빈 filter 는 전체 행이 대상이 되므로 거부
+			if (string.IsNullOrWhiteSpace(query.Filter))
+				return BadRequest("Filter is required");
 
-			if (countryResponse is null)
-				return NotFound();
-
-			return countryResponse;
+			return new { count = await _countriesService.DeleteCountries(query.Filter) };
 		}
 	}
 }
