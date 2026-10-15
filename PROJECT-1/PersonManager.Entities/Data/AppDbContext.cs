@@ -1,6 +1,6 @@
 using System.Text.Json;
-using PersonManager.Entities.Modules.Countries;
-using PersonManager.Entities.Modules.Users;
+using PersonManager.Entities.Modules.Identity.Countries;
+using PersonManager.Entities.Modules.Identity.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace PersonManager.Entities.Data;

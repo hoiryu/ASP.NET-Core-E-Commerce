@@ -2,14 +2,14 @@ using System.Text.Json.Serialization;
 using Gridify;
 using Microsoft.EntityFrameworkCore;
 using PersonManager.Entities.Data;
-using PersonManager.Repositories.Modules.Countries;
-using PersonManager.Repositories.Modules.Users;
-using PersonManager.RepositoryContracts.Modules.Countries;
-using PersonManager.RepositoryContracts.Modules.Users;
-using PersonManager.ServiceContracts.Modules.Countries;
-using PersonManager.ServiceContracts.Modules.Users;
-using PersonManager.Services.Modules.Countries;
-using PersonManager.Services.Modules.Users;
+using PersonManager.Repositories.Modules.Identity.Countries;
+using PersonManager.Repositories.Modules.Identity.Users;
+using PersonManager.RepositoryContracts.Modules.Identity.Countries;
+using PersonManager.RepositoryContracts.Modules.Identity.Users;
+using PersonManager.ServiceContracts.Modules.Identity.Countries;
+using PersonManager.ServiceContracts.Modules.Identity.Users;
+using PersonManager.Services.Modules.Identity.Countries;
+using PersonManager.Services.Modules.Identity.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,4 +1,4 @@
-using PersonManager.Entities.Modules.Countries;
+using PersonManager.Entities.Modules.Identity.Countries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

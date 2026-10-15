@@ -1,4 +1,4 @@
-using PersonManager.Entities.Modules.Users;
+using PersonManager.Entities.Modules.Identity.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -38,7 +38,7 @@
 | `PersonManager.Api/Common/Templates/RazorTemplateRenderer.cs` | Api | Razor 컴포넌트 → HTML 문자열 |
 | `PersonManager.Api/Templates/_Imports.razor` | Api | 템플릿 공통 `@using` |
 | `PersonManager.Api/Templates/Users/UsersReport.razor` | Api | 사용자 목록 PDF 템플릿 |
-| `PersonManager.Api/Controllers/Modules/Users/UsersController.cs` | Api | `GET api/users/pdf` 액션 추가 (수정) |
+| `PersonManager.Api/Controllers/Modules/Identity/Users/UsersController.cs` | Api | `GET api/users/pdf` 액션 추가 (수정) |
 | `PersonManager.Api/Program.cs` | Api | DI 등록 (수정) |
 
 > Razor 템플릿은 Api 프로젝트에 둡니다. Api는 `Microsoft.NET.Sdk.Web`이라 `.razor` 파일과 `HtmlRenderer`를 **추가 패키지 없이** 쓸 수 있습니다.
@@ -206,7 +206,7 @@ public class RazorTemplateRenderer(IServiceProvider _serviceProvider, ILoggerFac
 
 ```razor
 @using Microsoft.AspNetCore.Components
-@using PersonManager.ServiceContracts.Modules.Users.Dtos
+@using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos
 ```
 
 ### 4-5. 템플릿 — `PersonManager.Api/Templates/Users/UsersReport.razor`
@@ -295,7 +295,7 @@ builder.Services.AddScoped<RazorTemplateRenderer>();
 
 > `PuppeteerPdfGenerator`는 **반드시 Singleton**으로 등록합니다. Scoped로 등록하면 요청마다 Chrome을 새로 띄웠다 닫아서 매우 느려집니다.
 
-### 4-7. 컨트롤러 — `PersonManager.Api/Controllers/Modules/Users/UsersController.cs`
+### 4-7. 컨트롤러 — `PersonManager.Api/Controllers/Modules/Identity/Users/UsersController.cs`
 
 생성자에 의존성 2개를 추가하고, 기존 `GetUsers`와 같은 조회 조건을 받는 액션을 만듭니다.
 
@@ -305,10 +305,10 @@ using PersonManager.Api.Common.Templates;
 using PersonManager.Api.Templates.Users;
 using PersonManager.ServiceContracts.Common.Dtos;
 using PersonManager.ServiceContracts.Common.Pdf;
-using PersonManager.ServiceContracts.Modules.Users;
-using PersonManager.ServiceContracts.Modules.Users.Dtos;
+using PersonManager.ServiceContracts.Modules.Identity.Users;
+using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
 
-namespace PersonManager.Api.Controllers.Modules.Users
+namespace PersonManager.Api.Controllers.Modules.Identity.Users
 {
 	[Route("api/[controller]")]
 	[ApiController]

@@ -25,7 +25,7 @@ namespace PersonManager.Entities.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PersonManager.Entities.Modules.Countries.Country", b =>
+            modelBuilder.Entity("PersonManager.Entities.Modules.Identity.Countries.Country", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,7 +200,7 @@ namespace PersonManager.Entities.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PersonManager.Entities.Modules.Users.User", b =>
+            modelBuilder.Entity("PersonManager.Entities.Modules.Identity.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1355,9 +1355,9 @@ namespace PersonManager.Entities.Migrations
                         });
                 });
 
-            modelBuilder.Entity("PersonManager.Entities.Modules.Users.User", b =>
+            modelBuilder.Entity("PersonManager.Entities.Modules.Identity.Users.User", b =>
                 {
-                    b.HasOne("PersonManager.Entities.Modules.Countries.Country", "Country")
+                    b.HasOne("PersonManager.Entities.Modules.Identity.Countries.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.SetNull)

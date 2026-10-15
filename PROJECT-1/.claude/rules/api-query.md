@@ -21,8 +21,8 @@
 
 | API | 필드 | 정의 위치 |
 |---|---|---|
-| `/api/countries` | `id`, `name` | `PersonManager.Repositories/Modules/Countries/CountriesRepository.cs` |
-| `/api/users` | `id`, `name`, `email`, `dateOfBirth`, `gender`, `address`, `receiveNewsLetters`, `country.id`, `country.name` | `PersonManager.Repositories/Modules/Users/UsersRepository.cs` |
+| `/api/countries` | `id`, `name` | `PersonManager.Repositories/Modules/Identity/Countries/CountriesRepository.cs` |
+| `/api/users` | `id`, `name`, `email`, `dateOfBirth`, `gender`, `address`, `receiveNewsLetters`, `country.id`, `country.name` | `PersonManager.Repositories/Modules/Identity/Users/UsersRepository.cs` |
 
 등록되지 않은 필드를 쓰면 `ArgumentException: Field 'xxx' is not mapped` 가 난다.
 필드를 추가하거나 바꾸면 mapper 와 이 문서를 함께 수정한다.

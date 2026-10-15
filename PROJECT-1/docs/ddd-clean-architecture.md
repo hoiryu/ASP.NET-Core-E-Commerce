@@ -16,7 +16,7 @@ PersonManager.Api → PersonManager.Services → PersonManager.ServiceContracts 
 | 문제 | 위치 |
 |---|---|
 | 도메인 프로젝트(`PersonManager.Entities`)가 EF Core 패키지와 `AppDbContext`, 마이그레이션, Seed를 함께 가지고 있음. 도메인이 인프라에 의존함 | `PersonManager.Entities/PersonManager.Entities.csproj`, `PersonManager.Entities/Data/` |
-| 엔티티가 빈약함(anemic). public setter만 있어서 아무 값이나 넣을 수 있음 | `PersonManager.Entities/Modules/Users/User.cs`, `PersonManager.Entities/Modules/Countries/Country.cs` |
+| 엔티티가 빈약함(anemic). public setter만 있어서 아무 값이나 넣을 수 있음 | `PersonManager.Entities/Modules/Identity/Users/User.cs`, `PersonManager.Entities/Modules/Identity/Countries/Country.cs` |
 | 규칙이 서비스와 DTO에 흩어져 있음. 이메일 형식은 DTO의 `[EmailAddress]`에서, 국가 존재 여부와 이름 중복은 서비스에서 검사함 | `PersonManager.Services/Modules/*/…Service.cs` |
 | DTO가 엔티티를 직접 만들어서 `PersonManager.ServiceContracts`가 `PersonManager.Entities`를 참조함 | `UserCreateRequest.ToEntity()`, `UserResponse`의 `ToResponse()` |
 | `Gender`가 엔티티에서는 `string`이고 DTO에서는 `GenderOptions` enum이라 변환이 곳곳에 있음 | `UserQueryExtensions`, `UserMappings` |
@@ -190,7 +190,7 @@ PROJECT-1/
    │  ├─ Persistence/ AppDbContext.cs, Configurations/, Seeds/, Migrations/
    │  └─ DependencyInjection.cs           # AddInfrastructure(IConfiguration)
    └─ PersonManager.Api/                 # → Application, Infrastructure
-      ├─ Controllers/Modules/{Users,Countries}/
+      ├─ Controllers/Modules/Identity/{Users,Countries}/
       ├─ Middleware/ExceptionHandlingMiddleware.cs
       └─ Program.cs
 ```
@@ -263,8 +263,8 @@ public class User
 
 | 현재 | 목표 |
 |---|---|
-| `PersonManager.Entities/Modules/Users/User.cs`, `PersonManager.Entities/Modules/Countries/Country.cs` | `src/PersonManager.Domain/{Users,Countries}/` (팩토리 + private setter) |
-| `PersonManager.ServiceContracts/Modules/Users/Enums/GenderOptions.cs` | `src/PersonManager.Domain/Users/Gender.cs` |
+| `PersonManager.Entities/Modules/Identity/Users/User.cs`, `PersonManager.Entities/Modules/Identity/Countries/Country.cs` | `src/PersonManager.Domain/{Users,Countries}/` (팩토리 + private setter) |
+| `PersonManager.ServiceContracts/Modules/Identity/Users/Enums/GenderOptions.cs` | `src/PersonManager.Domain/Users/Gender.cs` |
 | `PersonManager.Entities/Data/AppDbContext.cs`, `Data/Configurations/`, `Data/Seeds/` | `src/PersonManager.Infrastructure/Persistence/` |
 | `PersonManager.Entities/Migrations/` | `src/PersonManager.Infrastructure/Persistence/Migrations/` (namespace만 수정) |
 | `PersonManager.ServiceContracts/Common/*` | `src/PersonManager.Application/Common/*` |
