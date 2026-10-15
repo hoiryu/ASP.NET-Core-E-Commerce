@@ -1,5 +1,5 @@
-using PersonManager.Entities.Modules.Users;
 using Gridify;
+using PersonManager.Entities.Modules.Users;
 using PersonManager.RepositoryContracts.Modules.Countries;
 using PersonManager.RepositoryContracts.Modules.Users;
 using PersonManager.ServiceContracts.Modules.Users;
@@ -18,7 +18,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 
 		if (
 			userCreateRequest.Country?.Id is Guid countryId
-			&& (await _countriesRepository.GetCountries(new GridifyQuery { Filter = $"id={countryId}", PageSize = 1 })).Count == 0
+			&& !await _countriesRepository.ExistsCountryById(countryId)
 		)
 			throw new ArgumentException("Given country id doesn't exist");
 
@@ -42,13 +42,11 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 
 		if (
 			userUpdateRequest.Country?.Id is Guid countryId
-			&& (await _countriesRepository.GetCountries(new GridifyQuery { Filter = $"id={countryId}", PageSize = 1 })).Count == 0
+			&& !await _countriesRepository.ExistsCountryById(countryId)
 		)
 			throw new ArgumentException("Given country id doesn't exist");
 
-		User? matchingUser = (
-			await _usersRepository.GetUsers(new GridifyQuery { Filter = $"id={userUpdateRequest.Id}", PageSize = 1 })
-		).Data.FirstOrDefault();
+		User? matchingUser = await _usersRepository.GetUserById(userUpdateRequest.Id);
 
 		if (matchingUser == null)
 			return null;
@@ -74,8 +72,13 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 			throw new ArgumentNullException(nameof(userId));
 		}
 
-		User? deletedUser = await _usersRepository.DeleteUser(userId.Value);
+		User? matchingUser = await _usersRepository.GetUserById(userId.Value);
 
-		return deletedUser?.ToResponse();
+		if (matchingUser == null)
+			return null;
+
+		User deletedUser = await _usersRepository.DeleteUser(matchingUser);
+
+		return deletedUser.ToResponse();
 	}
 }

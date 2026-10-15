@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using PersonManager.Entities.Data;
 using Gridify;
 using Microsoft.EntityFrameworkCore;
+using PersonManager.Entities.Data;
 using PersonManager.Repositories.Modules.Countries;
 using PersonManager.Repositories.Modules.Users;
 using PersonManager.RepositoryContracts.Modules.Countries;

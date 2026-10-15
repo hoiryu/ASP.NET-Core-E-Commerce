@@ -1,5 +1,5 @@
-﻿using PersonManager.Entities.Modules.Countries;
-using Gridify;
+﻿using Gridify;
+using PersonManager.Entities.Modules.Countries;
 using PersonManager.RepositoryContracts.Modules.Countries;
 using PersonManager.ServiceContracts.Modules.Countries;
 using PersonManager.ServiceContracts.Modules.Countries.Dtos;
@@ -16,11 +16,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 			throw new ArgumentException("countryCreateRequest and countryCreateRequest.Name must not be null");
 		}
 
-		Paging<Country> sameNameCountries = await _countriesRepository.GetCountries(
-			new GridifyQuery { Filter = $"name={GridifyHelper.Escape(countryCreateRequest.Name)}", PageSize = 1 }
-		);
-
-		if (sameNameCountries.Count > 0)
+		if (await _countriesRepository.ExistsCountryByName(countryCreateRequest.Name))
 		{
 			throw new ArgumentException("Given country name already exists");
 		}
@@ -43,9 +39,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 
 		ValidationHelper.ModelValidation(countryUpdateRequest);
 
-		Country? matchingCountry = (
-			await _countriesRepository.GetCountries(new GridifyQuery { Filter = $"id={countryUpdateRequest.Id}", PageSize = 1 })
-		).Data.FirstOrDefault();
+		Country? matchingCountry = await _countriesRepository.GetCountryById(countryUpdateRequest.Id);
 
 		if (matchingCountry == null)
 			return null;
@@ -62,8 +56,13 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 		if (!countryId.HasValue)
 			throw new ArgumentNullException(nameof(countryId));
 
-		Country? deletedCountry = await _countriesRepository.DeleteCountry(countryId.Value);
+		Country? matchingCountry = await _countriesRepository.GetCountryById(countryId.Value);
 
-		return deletedCountry?.ToResponse();
+		if (matchingCountry == null)
+			return null;
+
+		Country deletedCountry = await _countriesRepository.DeleteCountry(matchingCountry);
+
+		return deletedCountry.ToResponse();
 	}
 }

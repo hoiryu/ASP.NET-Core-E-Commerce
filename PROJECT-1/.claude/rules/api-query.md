@@ -40,10 +40,9 @@
 | `$` | 끝남 | `name$land` |
 | `!$` | 끝나지 않음 | `name!$land` |
 | `>` `<` `>=` `<=` | 크기 비교 (날짜, 숫자) | `dateOfBirth>=1990-01-01` |
-| `/i` (값 뒤) | 대소문자 무시 (아래 참고) | `name=korea/i` |
+| `/i` (값 뒤) | 대소문자 무시 | `name=korea/i` |
 
-대소문자 구분은 DB collation 이 결정한다. 현재 SQL Server 기본 collation(`*_CI_AS`)은 대소문자를 구분하지 않으므로 `/i` 없이도 `name=korea` 가 `Korea` 와 일치한다.
-`/i` 는 양쪽에 `LOWER()` 를 씌워 인덱스를 못 타게 할 수 있으므로 쓰지 않는다. 컬럼을 `*_CS_AS` 로 바꾼 경우에만 의미가 있다.
+현재 DB collation 은 대소문자를 구분하지 않으므로 `/i` 는 쓰지 않는다(`name=korea` 도 `Korea` 와 일치).
 
 ## 조건 조합
 
@@ -78,7 +77,6 @@ orderBy=country.name, name desc     여러 개는 쉼표로, 앞쪽이 우선
 ## 특수문자 이스케이프
 
 값 안의 `, | ( ) \ /i` 앞에는 `\` 를 붙인다. 예: `filter=name=Smoke\,\(Land\)` → 값 `Smoke,(Land)`.
-서버 코드에서 사용자 입력을 필터 값으로 넣을 때는 `PersonManager.Services/Common/Helpers/GridifyHelper.Escape()` 를 쓴다.
 
 ## URL 인코딩
 
@@ -86,15 +84,6 @@ orderBy=country.name, name desc     여러 개는 쉼표로, 앞쪽이 우선
 
 - JS: `new URLSearchParams({ filter: "name=*Kim|name=*Lee", orderBy: "name desc" })`
 - curl: `curl -G URL --data-urlencode "filter=..." --data-urlencode "orderBy=..."`
-
-## 서버 코드에서 내부 조회
-
-Service 에서 단건 조회나 존재 확인을 할 때도 같은 문법을 쓴다:
-
-```csharp
-new GridifyQuery { Filter = $"id={id}", PageSize = 1 }
-new GridifyQuery { Filter = $"name={GridifyHelper.Escape(name)}", PageSize = 1 }
-```
 
 ## 예시
 

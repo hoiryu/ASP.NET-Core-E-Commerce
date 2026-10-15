@@ -40,7 +40,12 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 			throw new ArgumentException(string.Join(", ", errors));
 
 		// COUNT 쿼리 + (JOIN + WHERE + ORDER BY + OFFSET/FETCH) 쿼리 실행
-		return await _db.Users.Include(temp => temp.Country).GridifyAsync(query, _mapper);
+		return await _db.Users.AsNoTracking().Include(temp => temp.Country).GridifyAsync(query, _mapper);
+	}
+
+	public async Task<User?> GetUserById(Guid userId)
+	{
+		return await _db.Users.Include(temp => temp.Country).FirstOrDefaultAsync(temp => temp.Id == userId);
 	}
 
 	/// <summary>
@@ -57,16 +62,14 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 		return user;
 	}
 
-	public async Task<User?> DeleteUser(Guid userId)
+	/// <summary>
+	/// 같은 DbContext 에서 조회해 추적 중인 엔티티를 받아 삭제 (재조회하지 않음)
+	/// </summary>
+	public async Task<User> DeleteUser(User user)
 	{
-		User? matchingUser = await _db.Users.Include(temp => temp.Country).FirstOrDefaultAsync(temp => temp.Id == userId);
-
-		if (matchingUser == null)
-			return null;
-
-		_db.Users.Remove(matchingUser);
+		_db.Users.Remove(user);
 		await _db.SaveChangesAsync();
 
-		return matchingUser;
+		return user;
 	}
 }

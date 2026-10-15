@@ -9,7 +9,13 @@ public interface ICountriesRepository
 
 	Task<Paging<Country>> GetCountries(GridifyQuery query);
 
+	Task<Country?> GetCountryById(Guid countryId);
+
+	Task<bool> ExistsCountryById(Guid countryId);
+
+	Task<bool> ExistsCountryByName(string name);
+
 	Task<Country> UpdateCountry(Country country);
 
-	Task<Country?> DeleteCountry(Guid countryId);
+	Task<Country> DeleteCountry(Country country);
 }

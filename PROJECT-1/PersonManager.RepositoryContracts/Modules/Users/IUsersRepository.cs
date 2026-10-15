@@ -9,7 +9,9 @@ public interface IUsersRepository
 
 	Task<Paging<User>> GetUsers(GridifyQuery query);
 
+	Task<User?> GetUserById(Guid userId);
+
 	Task<User> UpdateUser(User user);
 
-	Task<User?> DeleteUser(Guid userId);
+	Task<User> DeleteUser(User user);
 }
