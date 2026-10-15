@@ -45,7 +45,8 @@ namespace PersonManager.Entities.Migrations
                         name: "fk_users_countries_country_id",
                         column: x => x.country_id,
                         principalTable: "countries",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.InsertData(
@@ -94,7 +95,7 @@ namespace PersonManager.Entities.Migrations
                     { new Guid("00000000-0000-0000-0001-000000000002"), "경기도 안성시", new Guid("00000000-0000-0000-0000-000000000001"), new DateTime(1990, 10, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), "test2@mail.com", "Female", "최아무개", false },
                     { new Guid("00000000-0000-0000-0001-000000000003"), "부산광역시", new Guid("00000000-0000-0000-0000-000000000001"), new DateTime(1995, 2, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), "test3@mail.com", "Male", "박아무개", true },
                     { new Guid("00000000-0000-0000-0001-000000000004"), "경기도 수원시", new Guid("00000000-0000-0000-0000-000000000003"), new DateTime(1987, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), "test4@mail.com", "Male", "우아무개", true },
-                    { new Guid("00000000-0000-0000-0001-000000000005"), "강원도 춘천시", new Guid("00000000-0000-0000-0000-000000000002"), new DateTime(1995, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "test5@mail.com", "Gender", "강아무개", false },
+                    { new Guid("00000000-0000-0000-0001-000000000005"), "강원도 춘천시", new Guid("00000000-0000-0000-0000-000000000002"), new DateTime(1995, 2, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "test5@mail.com", "Female", "강아무개", false },
                     { new Guid("00000000-0000-0000-0001-000000000006"), "인천광역시", new Guid("00000000-0000-0000-0000-000000000004"), new DateTime(1988, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), "test6@mail.com", "Male", "오아무개", false },
                     { new Guid("00000000-0000-0000-0001-000000000007"), "충청북도 청주시", new Guid("00000000-0000-0000-0000-000000000003"), new DateTime(1983, 2, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), "test7@mail.com", "Male", "연아무개", true },
                     { new Guid("00000000-0000-0000-0001-000000000008"), "대구광역시", new Guid("00000000-0000-0000-0000-000000000003"), new DateTime(1998, 12, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), "test8@mail.com", "Female", "유아무개", true },
@@ -203,6 +204,13 @@ namespace PersonManager.Entities.Migrations
                 name: "ix_users_country_id",
                 table: "users",
                 column: "country_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                table: "users",
+                column: "email",
+                unique: true,
+                filter: "[email] IS NOT NULL");
         }
 
         /// <inheritdoc />

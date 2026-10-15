@@ -17,6 +17,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
 		builder.HasIndex(u => u.Email).IsUnique();
 
-		builder.HasOne(u => u.Country).WithMany().HasForeignKey(u => u.CountryId);
+		// Country 삭제 시 참조하는 User 의 CountryId 를 DB 가 null 로 변경
+		builder.HasOne(u => u.Country).WithMany().HasForeignKey(u => u.CountryId).OnDelete(DeleteBehavior.SetNull);
 	}
 }
