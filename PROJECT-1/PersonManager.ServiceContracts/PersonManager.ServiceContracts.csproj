@@ -7,8 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../PersonManager.Entities/PersonManager.Entities.csproj" />
-    <ProjectReference Include="../PersonManager.RepositoryContracts/PersonManager.RepositoryContracts.csproj" />
+    <PackageReference Include="Gridify" Version="2.20.0" />
   </ItemGroup>
 
 </Project>

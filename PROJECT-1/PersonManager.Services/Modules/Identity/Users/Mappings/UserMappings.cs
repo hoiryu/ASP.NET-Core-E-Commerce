@@ -1,15 +1,15 @@
 using PersonManager.Entities.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
-using PersonManager.ServiceContracts.Modules.Identity.Countries.Mappings;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Enums;
+using PersonManager.Services.Modules.Identity.Countries.Mappings;
 
-namespace PersonManager.ServiceContracts.Modules.Identity.Users.Mappings;
+namespace PersonManager.Services.Modules.Identity.Users.Mappings;
 
 /// <summary>
 /// User 관련 DTO ↔ Entity 변환
 /// </summary>
-public static class UserMappings
+internal static class UserMappings
 {
 	public static User ToEntity(this UserCreateRequest request) =>
 		new()

@@ -2,12 +2,12 @@ using PersonManager.Entities.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries.Dtos;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
 
-namespace PersonManager.ServiceContracts.Modules.Identity.Countries.Mappings;
+namespace PersonManager.Services.Modules.Identity.Countries.Mappings;
 
 /// <summary>
 /// Country 관련 DTO ↔ Entity 변환
 /// </summary>
-public static class CountryMappings
+internal static class CountryMappings
 {
 	public static Country ToEntity(this CountryCreateRequest request) => new() { Name = request.Name };
 

@@ -4,8 +4,8 @@ using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
-using PersonManager.ServiceContracts.Modules.Identity.Users.Mappings;
 using PersonManager.Services.Common.Helpers;
+using PersonManager.Services.Modules.Identity.Users.Mappings;
 
 namespace PersonManager.Services.Modules.Identity.Users;
 

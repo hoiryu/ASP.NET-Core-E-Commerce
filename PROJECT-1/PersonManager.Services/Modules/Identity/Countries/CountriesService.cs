@@ -3,8 +3,8 @@ using PersonManager.Entities.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
-using PersonManager.ServiceContracts.Modules.Identity.Countries.Mappings;
 using PersonManager.Services.Common.Helpers;
+using PersonManager.Services.Modules.Identity.Countries.Mappings;
 
 namespace PersonManager.Services.Modules.Identity.Countries;
 
