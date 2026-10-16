@@ -10,6 +10,8 @@
     <None Update="Data\Seeds\*.json" CopyToOutputDirectory="PreserveNewest" />
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12" />
+    <!-- SqlClient 가 끌어오는 취약 버전(9.0.11) 대신 패치 버전 고정 -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
 </Project>
