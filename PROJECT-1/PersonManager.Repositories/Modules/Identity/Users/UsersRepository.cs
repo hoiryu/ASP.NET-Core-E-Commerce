@@ -1,10 +1,11 @@
-using PersonManager.Entities.Data;
-using PersonManager.Entities.Modules.Identity.Users;
 using Gridify;
 using Gridify.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using PersonManager.Entities.Data;
+using PersonManager.Entities.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
+using PersonManager.Repositories.Common.Extensions;
 
 namespace PersonManager.Repositories.Modules.Identity.Users;
 
@@ -37,8 +38,7 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 
 	public async Task<Paging<User>> GetUsers(GridifyQuery query)
 	{
-		if (!query.IsValid(out var errors, _mapper))
-			throw new ArgumentException(string.Join(", ", errors));
+		query.EnsureValid(_mapper);
 
 		// COUNT 쿼리 + (JOIN + WHERE + ORDER BY + OFFSET/FETCH) 쿼리 실행
 		return await _db.Users.AsNoTracking().Include(temp => temp.Country).GridifyAsync(query, _mapper);
@@ -49,11 +49,9 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 	/// </summary>
 	public async Task<int> UpdateUsers(string filter, UserUpdate values)
 	{
-		ValidateFilter(filter);
-
 		// null 이 아닌 값만 SET
 		return await _db
-			.Users.ApplyFiltering(filter, _mapper)
+			.Users.ApplyBulkFiltering(filter, _mapper)
 			.ExecuteUpdateAsync(setters =>
 			{
 				if (values.Name is not null)
@@ -79,20 +77,6 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 	/// </summary>
 	public async Task<int> DeleteUsers(string filter)
 	{
-		ValidateFilter(filter);
-
-		return await _db.Users.ApplyFiltering(filter, _mapper).ExecuteDeleteAsync();
-	}
-
-	/// <summary>
-	/// 빈 filter 는 전체 행이 대상이 되므로 거부
-	/// </summary>
-	private static void ValidateFilter(string filter)
-	{
-		if (string.IsNullOrWhiteSpace(filter))
-			throw new ArgumentException("Filter is required for bulk operations");
-
-		if (!new GridifyQuery { Filter = filter }.IsValid(out var errors, _mapper))
-			throw new ArgumentException(string.Join(", ", errors));
+		return await _db.Users.ApplyBulkFiltering(filter, _mapper).ExecuteDeleteAsync();
 	}
 }

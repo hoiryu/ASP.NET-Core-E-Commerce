@@ -5,6 +5,7 @@ using PersonManager.Entities.Data;
 using PersonManager.Entities.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries.Dtos;
+using PersonManager.Repositories.Common.Extensions;
 
 namespace PersonManager.Repositories.Modules.Identity.Countries;
 
@@ -27,8 +28,7 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 
 	public async Task<Paging<Country>> GetCountries(GridifyQuery query)
 	{
-		if (!query.IsValid(out var errors, _mapper))
-			throw new ArgumentException(string.Join(", ", errors));
+		query.EnsureValid(_mapper);
 
 		// COUNT 쿼리 + (WHERE + ORDER BY + OFFSET/FETCH) 쿼리 실행
 		return await _db.Countries.AsNoTracking().GridifyAsync(query, _mapper);
@@ -55,11 +55,9 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 	/// </summary>
 	public async Task<int> UpdateCountries(string filter, CountryUpdate values)
 	{
-		ValidateFilter(filter);
-
 		// null 이 아닌 값만 SET
 		return await _db
-			.Countries.ApplyFiltering(filter, _mapper)
+			.Countries.ApplyBulkFiltering(filter, _mapper)
 			.ExecuteUpdateAsync(setters =>
 			{
 				if (values.Name is not null)
@@ -73,20 +71,6 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 	public async Task<int> DeleteCountries(string filter)
 	{
 		// 참조하는 User 의 CountryId 는 DB FK(ON DELETE SET NULL) 가 null 로 변경
-		ValidateFilter(filter);
-
-		return await _db.Countries.ApplyFiltering(filter, _mapper).ExecuteDeleteAsync();
-	}
-
-	/// <summary>
-	/// 빈 filter 는 전체 행이 대상이 되므로 거부
-	/// </summary>
-	private static void ValidateFilter(string filter)
-	{
-		if (string.IsNullOrWhiteSpace(filter))
-			throw new ArgumentException("Filter is required for bulk operations");
-
-		if (!new GridifyQuery { Filter = filter }.IsValid(out var errors, _mapper))
-			throw new ArgumentException(string.Join(", ", errors));
+		return await _db.Countries.ApplyBulkFiltering(filter, _mapper).ExecuteDeleteAsync();
 	}
 }
