@@ -1,6 +1,6 @@
 services:
     mssql:
-        image: mcr.microsoft.com/mssql/server:2022-latest
+        image: mcr.microsoft.com/mssql/server:2025-latest
         restart: always
         container_name: 6_dotnet_core_mssql_container
         volumes:
