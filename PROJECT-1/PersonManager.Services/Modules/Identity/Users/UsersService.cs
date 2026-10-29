@@ -17,10 +17,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 
 		ValidationHelper.ModelValidation(userCreateRequest);
 
-		if (
-			userCreateRequest.Country?.Id is Guid countryId
-			&& !await _countriesRepository.ExistsCountryById(countryId)
-		)
+		if (userCreateRequest.Country?.Id is Guid countryId && !await _countriesRepository.ExistsCountryById(countryId))
 			throw new ArgumentException("Given country id doesn't exist");
 
 		User user = await _usersRepository.CreateUser(userCreateRequest.ToEntity());
@@ -41,10 +38,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 
 		ValidationHelper.ModelValidation(userUpdateRequest);
 
-		if (
-			userUpdateRequest.Country?.Id is Guid countryId
-			&& !await _countriesRepository.ExistsCountryById(countryId)
-		)
+		if (userUpdateRequest.Country?.Id is Guid countryId && !await _countriesRepository.ExistsCountryById(countryId))
 			throw new ArgumentException("Given country id doesn't exist");
 
 		return await _usersRepository.UpdateUsers(filter ?? "", userUpdateRequest.ToUpdate());
