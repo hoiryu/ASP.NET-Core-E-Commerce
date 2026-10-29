@@ -9,7 +9,7 @@
 | 파라미터 | 설명 | 기본값 |
 |---|---|---|
 | `filter` | 검색 조건 | 없음 (전체) |
-| `orderBy` | 정렬 | 없음 (DB 순서) |
+| `orderBy` | 정렬 | `id` (페이징 순서 고정) |
 | `page` | 페이지 번호, 1부터 시작 | 1 |
 | `pageSize` | 한 페이지 건수 | 20 |
 
@@ -73,6 +73,8 @@ orderBy=name                        오름차순 (기본)
 orderBy=name desc                   내림차순
 orderBy=country.name, name desc     여러 개는 쉼표로, 앞쪽이 우선
 ```
+
+`orderBy` 를 생략하면 `id` 오름차순으로 정렬한다. ORDER BY 없는 페이징은 순서가 보장되지 않기 때문이다(`GridifyExtensions.EnsureOrdering`).
 
 ## 특수문자 이스케이프
 

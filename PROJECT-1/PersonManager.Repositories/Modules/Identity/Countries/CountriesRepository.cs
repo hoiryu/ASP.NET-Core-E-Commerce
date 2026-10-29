@@ -3,9 +3,9 @@ using Gridify.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using PersonManager.Entities.Data;
 using PersonManager.Entities.Modules.Identity.Countries;
+using PersonManager.Repositories.Common.Extensions;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries.Dtos;
-using PersonManager.Repositories.Common.Extensions;
 
 namespace PersonManager.Repositories.Modules.Identity.Countries;
 
@@ -29,6 +29,7 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 	public async Task<Paging<Country>> GetCountries(GridifyQuery query)
 	{
 		query.EnsureValid(_mapper);
+		query.EnsureOrdering();
 
 		// COUNT 쿼리 + (WHERE + ORDER BY + OFFSET/FETCH) 쿼리 실행
 		return await _db.Countries.AsNoTracking().GridifyAsync(query, _mapper);

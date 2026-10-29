@@ -3,9 +3,9 @@ using Gridify.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using PersonManager.Entities.Data;
 using PersonManager.Entities.Modules.Identity.Users;
+using PersonManager.Repositories.Common.Extensions;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
-using PersonManager.Repositories.Common.Extensions;
 
 namespace PersonManager.Repositories.Modules.Identity.Users;
 
@@ -39,6 +39,7 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 	public async Task<Paging<User>> GetUsers(GridifyQuery query)
 	{
 		query.EnsureValid(_mapper);
+		query.EnsureOrdering();
 
 		// COUNT 쿼리 + (JOIN + WHERE + ORDER BY + OFFSET/FETCH) 쿼리 실행
 		return await _db.Users.AsNoTracking().Include(temp => temp.Country).GridifyAsync(query, _mapper);
