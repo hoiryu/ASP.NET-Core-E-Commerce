@@ -12,8 +12,21 @@ using PersonManager.Services.Modules.Identity.Countries;
 using PersonManager.Services.Modules.Identity.Users;
 using Serilog;
 
-// 1단계: appsettings·DI 를 읽기 전에 쓰는 임시 로거 (호스트 구성 중 예외 기록용)
-Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
+// 1단계: 호스트 구성 전에 쓰는 임시 로거 (호스트 구성 중 예외 기록용)
+// 호스트가 아직 없으므로 appsettings 를 직접 읽어 파일 저장 설정을 2단계와 공유
+var bootstrapConfiguration = new ConfigurationBuilder()
+	.SetBasePath(Directory.GetCurrentDirectory()) // 호스트의 ContentRoot 와 같은 위치
+	.AddJsonFile("appsettings.json", optional: true)
+	.AddJsonFile(
+		$"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
+		optional: true
+	)
+	.Build();
+
+Log.Logger = new LoggerConfiguration()
+	.ReadFrom.Configuration(bootstrapConfiguration)
+	.WriteTo.Console()
+	.CreateBootstrapLogger();
 
 try
 {
@@ -64,7 +77,8 @@ try
 
 	var app = builder.Build();
 
-	app.UseStaticFiles(); // Static Files 먼저 처리 (요청 로그에서 제외)
+	app.UseStaticFiles(); // Static Files
+	// UseStaticFiles 보다 뒤에서 처리해서 Static File 로그는 제외
 	app.UseSerilogRequestLogging(o => o.IncludeQueryInRequestPath = true); // 요청당 한 줄: 메서드, 경로+쿼리, 상태 코드, 소요 시간
 	app.UseRouting(); // Routing 매칭 지점 표시
 	app.MapControllers(); // 매칭된 Endpoint 실행

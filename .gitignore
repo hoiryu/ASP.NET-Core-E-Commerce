@@ -84,3 +84,6 @@ npm-debug.log*
 appsettings.Development.json
 appsettings.Local.json
 secrets.json
+
+# Serilog file logs
+logs/
