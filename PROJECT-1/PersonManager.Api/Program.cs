@@ -79,7 +79,17 @@ try
 
 	app.UseStaticFiles(); // Static Files
 	// UseStaticFiles 보다 뒤에서 처리해서 Static File 로그는 제외
-	app.UseSerilogRequestLogging(o => o.IncludeQueryInRequestPath = true); // 요청당 한 줄: 메서드, 경로+쿼리, 상태 코드, 소요 시간
+	// 요청당 한 줄: 메서드, 경로+쿼리, 상태 코드, 소요 시간
+	app.UseSerilogRequestLogging(o =>
+	{
+		o.IncludeQueryInRequestPath = true;
+		// 모든 요청 완료 로그에 클라이언트 정보 추가
+		o.EnrichDiagnosticContext = (diag, http) =>
+		{
+			diag.Set("ClientIp", http.Connection.RemoteIpAddress?.ToString());
+			diag.Set("UserAgent", http.Request.Headers.UserAgent.ToString());
+		};
+	});
 	app.UseRouting(); // Routing 매칭 지점 표시
 	app.MapControllers(); // 매칭된 Endpoint 실행
 
