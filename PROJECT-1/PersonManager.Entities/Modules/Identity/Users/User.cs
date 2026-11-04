@@ -14,11 +14,11 @@ public class User
 
 	public string? Gender { get; set; }
 
-	public Guid? CountryId { get; set; }
-
 	public string? Address { get; set; }
 
 	public bool ReceiveNewsLetters { get; set; }
+
+	public Guid? CountryId { get; set; }
 
 	public Country? Country { get; set; }
 }
