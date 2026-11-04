@@ -8,11 +8,11 @@ namespace PersonManager.ServiceContracts.Modules.Identity.Countries;
 /// </summary>
 public interface ICountriesService
 {
-	Task<CountryResponse> CreateCountry(CountryCreateRequest? countryCreateRequest);
+	Task<List<CountryResponse>> CreateCountries(List<CountryCreateRequest> countryCreateRequests);
 
 	Task<Paging<CountryResponse>> GetCountries(GridifyQuery query);
 
-	Task<int> UpdateCountries(string? filter, CountryUpdateRequest? countryUpdateRequest);
+	Task<int> UpdateCountries(string? filter, CountryUpdateRequest countryUpdateRequest);
 
 	Task<int> DeleteCountries(string? filter);
 }

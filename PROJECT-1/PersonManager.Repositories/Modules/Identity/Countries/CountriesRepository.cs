@@ -18,12 +18,15 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 		.AddMap("id", temp => temp.Id)
 		.AddMap("name", temp => temp.Name);
 
-	public async Task<Country> CreateCountry(Country country)
+	/// <summary>
+	/// SaveChanges 한 번으로 INSERT 를 배치 실행 (트랜잭션 하나라서 하나라도 실패하면 전체 롤백)
+	/// </summary>
+	public async Task<List<Country>> CreateCountries(List<Country> countries)
 	{
-		_db.Countries.Add(country);
+		_db.Countries.AddRange(countries);
 		await _db.SaveChangesAsync();
 
-		return country;
+		return countries;
 	}
 
 	public async Task<Paging<Country>> GetCountries(GridifyQuery query)
@@ -44,11 +47,20 @@ public class CountriesRepository(AppDbContext _db) : ICountriesRepository
 	}
 
 	/// <summary>
+	/// 모든 id 가 존재하는지 COUNT 쿼리 한 번으로 확인 (ids 는 중복 없이 전달)
+	/// </summary>
+	public async Task<bool> ExistsCountriesByIds(List<Guid> countryIds)
+	{
+		return await _db.Countries.CountAsync(temp => countryIds.Contains(temp.Id)) == countryIds.Count;
+	}
+
+	/// <summary>
+	/// 이름 중 하나라도 존재하는지 EXISTS 쿼리 한 번으로 확인
 	/// 대소문자 구분은 DB collation 을 따름 (기본 *_CI_AS 는 구분하지 않음)
 	/// </summary>
-	public async Task<bool> ExistsCountryByName(string name)
+	public async Task<bool> ExistsAnyCountryByNames(List<string> names)
 	{
-		return await _db.Countries.AnyAsync(temp => temp.Name == name);
+		return await _db.Countries.AnyAsync(temp => names.Contains(temp.Name!));
 	}
 
 	/// <summary>

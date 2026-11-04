@@ -25,15 +25,20 @@ public class UsersRepository(AppDbContext _db) : IUsersRepository
 		.AddMap("country.id", temp => temp.CountryId)
 		.AddMap("country.name", temp => temp.Country!.Name);
 
-	public async Task<User> CreateUser(User user)
+	/// <summary>
+	/// SaveChanges 한 번으로 INSERT 를 배치 실행 (트랜잭션 하나라서 하나라도 실패하면 전체 롤백)
+	/// </summary>
+	public async Task<List<User>> CreateUsers(List<User> users)
 	{
-		_db.Users.Add(user);
+		_db.Users.AddRange(users);
 		await _db.SaveChangesAsync();
 
-		// 응답에 Country 를 담기 위해 내비게이션 속성 로드
-		await _db.Entry(user).Reference(temp => temp.Country).LoadAsync();
+		// 응답에 Country 를 담기 위해 쿼리 한 번으로 로드 (추적 중인 User 의 내비게이션 속성에 자동 연결)
+		List<Guid> countryIds = [.. users.Select(temp => temp.CountryId).OfType<Guid>().Distinct()];
+		if (countryIds.Count > 0)
+			await _db.Countries.Where(temp => countryIds.Contains(temp.Id)).LoadAsync();
 
-		return user;
+		return users;
 	}
 
 	public async Task<Paging<User>> GetUsers(GridifyQuery query)

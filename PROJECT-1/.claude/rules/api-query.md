@@ -109,6 +109,24 @@ GET /api/countries?filter=name=Korea
 GET /api/countries?filter=name^T&orderBy=name desc
 ```
 
+## 생성
+
+생성도 엔드포인트 하나로 여러 건을 받는다. 한 건도 배열로 보내고, 응답은 생성된 항목 배열(`id` 포함)이다.
+
+```
+POST /api/users       body: UserCreateRequest[]
+POST /api/countries   body: CountryCreateRequest[]
+```
+
+- 빈 배열이면 `ValidationHelper.ModelValidation` 에서 `ArgumentException` 으로 거부
+- 저장 전에 전체를 검증하고 `AddRange` + `SaveChanges` 한 번으로 INSERT 한다. 트랜잭션 하나라서 하나라도 실패하면 전체 롤백
+- users: `country.id` 는 쿼리 한 번으로 존재 여부를 확인
+- countries: 요청 안의 이름 중복(대소문자 무시)과 DB 에 이미 있는 이름을 거부
+
+```
+POST /api/countries   [{"name": "Korea"}, {"name": "Japan"}]
+```
+
 ## 수정·삭제
 
 수정·삭제는 `filter` 로 대상을 고르는 엔드포인트 하나뿐이다. 한 건만 바꾸려면 `filter=id=<guid>` 를 쓴다. `orderBy`·`page`·`pageSize` 는 무시하고, 응답은 `{ "count": <영향받은 행 수> }` 이다.
@@ -120,7 +138,7 @@ PATCH  /api/countries?filter=<조건>   body: CountryUpdateRequest
 DELETE /api/countries?filter=<조건>   (참조하는 User 의 country 는 null 로 변경)
 ```
 
-- `filter` 가 비면 400 (전체 행 수정·삭제 방지)
+- `filter` 가 비면 서비스에서 `ArgumentException` 으로 거부 (전체 행 수정·삭제 방지)
 - `email` 을 바꿀 때 대상이 여러 행이면 유니크 인덱스 위반으로 UPDATE 전체가 실패한다
 - `ExecuteUpdateAsync`/`ExecuteDeleteAsync` 로 SQL 한 번에 실행하며 `SaveChanges` 를 거치지 않는다
 

@@ -11,18 +11,18 @@ namespace PersonManager.Services.Modules.Identity.Users;
 
 public class UsersService(IUsersRepository _usersRepository, ICountriesRepository _countriesRepository) : IUsersService
 {
-	public async Task<UserResponse> CreateUser(UserCreateRequest? userCreateRequest)
+	public async Task<List<UserResponse>> CreateUsers(List<UserCreateRequest> userCreateRequests)
 	{
-		ArgumentNullException.ThrowIfNull(userCreateRequest);
+		// 저장 전에 전체를 검증 (하나라도 실패하면 아무것도 저장하지 않음)
+		ValidationHelper.ModelValidation(userCreateRequests);
 
-		ValidationHelper.ModelValidation(userCreateRequest);
-
-		if (userCreateRequest.Country?.Id is Guid countryId && !await _countriesRepository.ExistsCountryById(countryId))
+		List<Guid> countryIds = [.. userCreateRequests.Select(temp => temp.Country?.Id).OfType<Guid>().Distinct()];
+		if (countryIds.Count > 0 && !await _countriesRepository.ExistsCountriesByIds(countryIds))
 			throw new ArgumentException("Given country id doesn't exist");
 
-		User user = await _usersRepository.CreateUser(userCreateRequest.ToEntity());
+		List<User> users = await _usersRepository.CreateUsers([.. userCreateRequests.Select(temp => temp.ToEntity())]);
 
-		return user.ToResponse();
+		return [.. users.Select(user => user.ToResponse())];
 	}
 
 	public async Task<Paging<UserResponse>> GetUsers(GridifyQuery query)
@@ -32,20 +32,22 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return new Paging<UserResponse>(users.Count, users.Data.Select(user => user.ToResponse()));
 	}
 
-	public async Task<int> UpdateUsers(string? filter, UserUpdateRequest? userUpdateRequest)
+	public async Task<int> UpdateUsers(string? filter, UserUpdateRequest userUpdateRequest)
 	{
-		ArgumentNullException.ThrowIfNull(userUpdateRequest);
+		ValidationHelper.FilterValidation(filter);
 
 		ValidationHelper.ModelValidation(userUpdateRequest);
 
 		if (userUpdateRequest.Country?.Id is Guid countryId && !await _countriesRepository.ExistsCountryById(countryId))
 			throw new ArgumentException("Given country id doesn't exist");
 
-		return await _usersRepository.UpdateUsers(filter ?? "", userUpdateRequest.ToUpdate());
+		return await _usersRepository.UpdateUsers(filter, userUpdateRequest.ToUpdate());
 	}
 
 	public async Task<int> DeleteUsers(string? filter)
 	{
-		return await _usersRepository.DeleteUsers(filter ?? "");
+		ValidationHelper.FilterValidation(filter);
+
+		return await _usersRepository.DeleteUsers(filter);
 	}
 }

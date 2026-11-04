@@ -2,17 +2,27 @@ using Gridify;
 using Microsoft.AspNetCore.Mvc;
 using PersonManager.ServiceContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
+using Serilog;
 
 namespace PersonManager.Api.Controllers.Modules.Identity.Countries
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class CountriesController(ICountriesService _countriesService) : ControllerBase
+	public class CountriesController(ICountriesService _countriesService, IDiagnosticContext _diagnosticContext)
+		: ControllerBase
 	{
+		/// <summary>
+		/// 국가 일괄 생성 (한 건도 배열로 전달)
+		/// </summary>
 		[HttpPost]
-		public async Task<ActionResult<CountryResponse>> CreateCountry([FromBody] CountryCreateRequest countryCreateRequest)
+		public async Task<ActionResult<List<CountryResponse>>> CreateCountries(
+			[FromBody] List<CountryCreateRequest> countryCreateRequests
+		)
 		{
-			return await _countriesService.CreateCountry(countryCreateRequest);
+			var countries = await _countriesService.CreateCountries(countryCreateRequests);
+			_diagnosticContext.Set("AffectedCount", countries.Count); // 요청 완료 로그에 생성된 행 수 추가
+
+			return countries;
 		}
 
 		[HttpGet]
@@ -30,11 +40,10 @@ namespace PersonManager.Api.Controllers.Modules.Identity.Countries
 			[FromBody] CountryUpdateRequest countryUpdateRequest
 		)
 		{
-			// 빈 filter 는 전체 행이 대상이 되므로 거부
-			if (string.IsNullOrWhiteSpace(query.Filter))
-				return BadRequest("Filter is required");
+			var count = await _countriesService.UpdateCountries(query.Filter, countryUpdateRequest);
+			_diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-			return new { count = await _countriesService.UpdateCountries(query.Filter, countryUpdateRequest) };
+			return new { count };
 		}
 
 		/// <summary>
@@ -43,11 +52,10 @@ namespace PersonManager.Api.Controllers.Modules.Identity.Countries
 		[HttpDelete]
 		public async Task<ActionResult<object>> DeleteCountries([FromQuery] GridifyQuery query)
 		{
-			// 빈 filter 는 전체 행이 대상이 되므로 거부
-			if (string.IsNullOrWhiteSpace(query.Filter))
-				return BadRequest("Filter is required");
+			var count = await _countriesService.DeleteCountries(query.Filter);
+			_diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-			return new { count = await _countriesService.DeleteCountries(query.Filter) };
+			return new { count };
 		}
 	}
 }

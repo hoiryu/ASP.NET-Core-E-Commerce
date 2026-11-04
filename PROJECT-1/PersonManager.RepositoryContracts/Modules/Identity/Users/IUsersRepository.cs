@@ -1,12 +1,12 @@
-using PersonManager.Entities.Modules.Identity.Users;
 using Gridify;
+using PersonManager.Entities.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
 
 namespace PersonManager.RepositoryContracts.Modules.Identity.Users;
 
 public interface IUsersRepository
 {
-	Task<User> CreateUser(User user);
+	Task<List<User>> CreateUsers(List<User> users);
 
 	Task<Paging<User>> GetUsers(GridifyQuery query);
 

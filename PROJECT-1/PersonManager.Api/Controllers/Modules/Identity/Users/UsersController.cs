@@ -2,17 +2,26 @@ using Gridify;
 using Microsoft.AspNetCore.Mvc;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
+using Serilog;
 
 namespace PersonManager.Api.Controllers.Modules.Identity.Users
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class UsersController(IUsersService _usersService) : ControllerBase
+	public class UsersController(IUsersService _usersService, IDiagnosticContext _diagnosticContext) : ControllerBase
 	{
+		/// <summary>
+		/// 사용자 일괄 생성 (한 건도 배열로 전달)
+		/// </summary>
 		[HttpPost]
-		public async Task<ActionResult<UserResponse>> CreateUser([FromBody] UserCreateRequest userCreateRequest)
+		public async Task<ActionResult<List<UserResponse>>> CreateUsers(
+			[FromBody] List<UserCreateRequest> userCreateRequests
+		)
 		{
-			return await _usersService.CreateUser(userCreateRequest);
+			var users = await _usersService.CreateUsers(userCreateRequests);
+			_diagnosticContext.Set("AffectedCount", users.Count); // 요청 완료 로그에 생성된 행 수 추가
+
+			return users;
 		}
 
 		[HttpGet]
@@ -30,11 +39,10 @@ namespace PersonManager.Api.Controllers.Modules.Identity.Users
 			[FromBody] UserUpdateRequest userUpdateRequest
 		)
 		{
-			// 빈 filter 는 전체 행이 대상이 되므로 거부
-			if (string.IsNullOrWhiteSpace(query.Filter))
-				return BadRequest("Filter is required");
+			var count = await _usersService.UpdateUsers(query.Filter, userUpdateRequest);
+			_diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-			return new { count = await _usersService.UpdateUsers(query.Filter, userUpdateRequest) };
+			return new { count };
 		}
 
 		/// <summary>
@@ -43,11 +51,10 @@ namespace PersonManager.Api.Controllers.Modules.Identity.Users
 		[HttpDelete]
 		public async Task<ActionResult<object>> DeleteUsers([FromQuery] GridifyQuery query)
 		{
-			// 빈 filter 는 전체 행이 대상이 되므로 거부
-			if (string.IsNullOrWhiteSpace(query.Filter))
-				return BadRequest("Filter is required");
+			var count = await _usersService.DeleteUsers(query.Filter);
+			_diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-			return new { count = await _usersService.DeleteUsers(query.Filter) };
+			return new { count };
 		}
 	}
 }

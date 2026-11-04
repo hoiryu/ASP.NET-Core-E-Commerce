@@ -5,11 +5,11 @@ namespace PersonManager.ServiceContracts.Modules.Identity.Users;
 
 public interface IUsersService
 {
-	Task<UserResponse> CreateUser(UserCreateRequest? userCreateRequest);
+	Task<List<UserResponse>> CreateUsers(List<UserCreateRequest> userCreateRequests);
 
 	Task<Paging<UserResponse>> GetUsers(GridifyQuery query);
 
-	Task<int> UpdateUsers(string? filter, UserUpdateRequest? userUpdateRequest);
+	Task<int> UpdateUsers(string? filter, UserUpdateRequest userUpdateRequest);
 
 	Task<int> DeleteUsers(string? filter);
 }
