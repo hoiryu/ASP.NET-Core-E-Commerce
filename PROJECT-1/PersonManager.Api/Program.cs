@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Gridify;
 using Microsoft.EntityFrameworkCore;
+using PersonManager.Api.Endpoints.Modules.Identity.Countries;
+using PersonManager.Api.Endpoints.Modules.Identity.Users;
 using PersonManager.Entities.Data;
 using PersonManager.Repositories.Modules.Identity.Countries;
 using PersonManager.Repositories.Modules.Identity.Users;
@@ -32,10 +34,10 @@ try
 {
 	var builder = WebApplication.CreateBuilder(args);
 
-	#region Register Controllers
-	builder
-		.Services.AddControllers()
-		.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); // Enum 을 문자열로 직렬화
+	#region JSON
+	builder.Services.ConfigureHttpJsonOptions(options =>
+		options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()) // Enum 을 문자열로 직렬화
+	);
 	#endregion
 
 	#region EndPoint 를 kabab-case 로 변환
@@ -91,7 +93,9 @@ try
 		};
 	});
 	app.UseRouting(); // Routing 매칭 지점 표시
-	app.MapControllers(); // 매칭된 Endpoint 실행
+	// 매칭된 Endpoint 실행
+	app.MapCountriesEndpoints();
+	app.MapUsersEndpoints();
 
 	app.Run();
 	return 0;
