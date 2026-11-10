@@ -1,5 +1,5 @@
 using Gridify;
-using PersonManager.Api.Endpoints.Common;
+using PersonManager.Api.Endpoints.Common.Parameters;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
 using Serilog;

@@ -1,6 +1,6 @@
 using Gridify;
 
-namespace PersonManager.Api.Endpoints.Common;
+namespace PersonManager.Api.Endpoints.Common.Parameters;
 
 /// <summary>
 /// 목록 조회 쿼리스트링 (filter, orderBy, page, pageSize) 바인딩용
