@@ -40,6 +40,11 @@ try
 	);
 	#endregion
 
+	#region Validation
+	// Endpoint 매개변수의 DataAnnotations 를 핸들러 실행 전에 검사하고, 실패하면 400 ValidationProblem 반환
+	builder.Services.AddValidation();
+	#endregion
+
 	#region EndPoint 를 kabab-case 로 변환
 	builder.Services.AddRouting(o => o.LowercaseUrls = true);
 	#endregion
