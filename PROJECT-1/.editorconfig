@@ -11,6 +11,7 @@ indent_style = tab
 indent_size = 4
 dotnet_diagnostic.IDE0005.severity = warning
 dotnet_style_namespace_match_folder = true:warning
+csharp_style_namespace_declarations = file_scoped:warning
 
 [*.{json,yaml,yml}]
 indent_style = tab
