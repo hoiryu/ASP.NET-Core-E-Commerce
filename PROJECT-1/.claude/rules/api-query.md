@@ -139,7 +139,7 @@ DELETE /api/countries?filter=<조건>   (참조하는 User 의 country 는 null 
 ```
 
 - `filter` 가 비면 서비스에서 `ArgumentException` 으로 거부 (전체 행 수정·삭제 방지)
-- `email` 을 바꿀 때 대상이 여러 행이면 유니크 인덱스 위반으로 UPDATE 전체가 실패한다
+- `email` 을 바꿀 때 대상이 여러 행이거나 이미 있는 값이면 유니크 인덱스 위반으로 UPDATE 전체가 실패하고 409 를 반환한다
 - `ExecuteUpdateAsync`/`ExecuteDeleteAsync` 로 SQL 한 번에 실행하며 `SaveChanges` 를 거치지 않는다
 
 ```

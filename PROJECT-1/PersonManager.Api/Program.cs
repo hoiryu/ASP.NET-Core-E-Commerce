@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Gridify;
 using Microsoft.EntityFrameworkCore;
+using PersonManager.Api.Common.ExceptionHandlers;
 using PersonManager.Api.Endpoints.Modules.Identity.Countries;
 using PersonManager.Api.Endpoints.Modules.Identity.Users;
 using PersonManager.Entities.Data;
@@ -43,6 +44,13 @@ try
 	#region Validation
 	// Endpoint 매개변수의 DataAnnotations 를 핸들러 실행 전에 검사하고, 실패하면 400 ValidationProblem 반환
 	builder.Services.AddValidation();
+	#endregion
+
+	#region Exception Handling
+	// 오류 응답을 ProblemDetails(RFC 9457) 형식으로 통일
+	builder.Services.AddProblemDetails();
+	// ArgumentException → 400, 유니크 인덱스 위반 → 409 (그 외 예외는 500)
+	builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 	#endregion
 
 	#region EndPoint 를 kabab-case 로 변환
@@ -97,6 +105,8 @@ try
 			diag.Set("UserAgent", http.Request.Headers.UserAgent.ToString());
 		};
 	});
+	// 요청 로그보다 안쪽에 둬야 요청 로그에 변환된 상태 코드(400)가 기록된다
+	app.UseExceptionHandler();
 	app.UseRouting(); // Routing 매칭 지점 표시
 	// 매칭된 Endpoint 실행
 	app.MapCountriesEndpoints();
