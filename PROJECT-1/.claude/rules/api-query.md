@@ -1,3 +1,9 @@
+---
+paths:
+  - "PersonManager.*/**"
+  - "docs/**"
+---
+
 # API 목록 조회 쿼리스트링 (Gridify)
 
 `GET /api/users`, `GET /api/countries` 는 Gridify 의 `GridifyQuery` 로 필터·정렬·페이징을 받는다.
@@ -17,15 +23,9 @@
 
 ## 필드
 
-필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 Repository 의 `_mapper` 에 등록되어 있다.
-
-| API | 필드 | 정의 위치 |
-|---|---|---|
-| `/api/countries` | `id`, `name` | `PersonManager.Repositories/Modules/Identity/Countries/CountriesRepository.cs` |
-| `/api/users` | `id`, `name`, `email`, `dateOfBirth`, `gender`, `address`, `receiveNewsLetters`, `country.id`, `country.name` | `PersonManager.Repositories/Modules/Identity/Users/UsersRepository.cs` |
+필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 Repository(`PersonManager.Repositories/Modules/Identity/*/*Repository.cs`)의 `_mapper` 에 등록된 것뿐이다.
 
 등록되지 않은 필드를 쓰면 `ArgumentException: Field 'xxx' is not mapped` 가 난다.
-필드를 추가하거나 바꾸면 mapper 와 이 문서를 함께 수정한다.
 
 ## 연산자
 
