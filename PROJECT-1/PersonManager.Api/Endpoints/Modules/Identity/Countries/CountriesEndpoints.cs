@@ -1,8 +1,9 @@
 using Gridify;
+using PersonManager.Api.Endpoints.Common.Dtos;
+using PersonManager.Api.Endpoints.Common.EndpointFilters;
 using PersonManager.Api.Endpoints.Common.Parameters;
 using PersonManager.ServiceContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
-using Serilog;
 
 namespace PersonManager.Api.Endpoints.Modules.Identity.Countries;
 
@@ -12,10 +13,10 @@ public static class CountriesEndpoints
 	{
 		var group = app.MapGroup("/api/countries");
 
-		group.MapPost("/", CreateCountries);
+		group.MapPost("/", CreateCountries).AddEndpointFilter<MutationEndpointFilter>();
 		group.MapGet("/", GetCountries);
-		group.MapPatch("/", UpdateCountries);
-		group.MapDelete("/", DeleteCountries);
+		group.MapPatch("/", UpdateCountries).AddEndpointFilter<MutationEndpointFilter>();
+		group.MapDelete("/", DeleteCountries).AddEndpointFilter<MutationEndpointFilter>();
 
 		return group;
 	}
@@ -25,14 +26,10 @@ public static class CountriesEndpoints
 	/// </summary>
 	private static async Task<List<CountryResponse>> CreateCountries(
 		List<CountryCreateRequest> countryCreateRequests,
-		ICountriesService countriesService,
-		IDiagnosticContext diagnosticContext
+		ICountriesService countriesService
 	)
 	{
-		var countries = await countriesService.CreateCountries(countryCreateRequests);
-		diagnosticContext.Set("AffectedCount", countries.Count); // 요청 완료 로그에 생성된 행 수 추가
-
-		return countries;
+		return await countriesService.CreateCountries(countryCreateRequests);
 	}
 
 	private static async Task<Paging<CountryResponse>> GetCountries(
@@ -46,31 +43,27 @@ public static class CountriesEndpoints
 	/// <summary>
 	/// filter 에 맞는 국가 일괄 수정 (orderBy·page·pageSize 는 무시)
 	/// </summary>
-	private static async Task<object> UpdateCountries(
+	private static async Task<MutationResponse> UpdateCountries(
 		string? filter,
 		CountryUpdateRequest countryUpdateRequest,
-		ICountriesService countriesService,
-		IDiagnosticContext diagnosticContext
+		ICountriesService countriesService
 	)
 	{
 		var count = await countriesService.UpdateCountries(filter, countryUpdateRequest);
-		diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-		return new { count };
+		return new MutationResponse(count);
 	}
 
 	/// <summary>
 	/// filter 에 맞는 국가 일괄 삭제 (orderBy·page·pageSize 는 무시)
 	/// </summary>
-	private static async Task<object> DeleteCountries(
+	private static async Task<MutationResponse> DeleteCountries(
 		string? filter,
-		ICountriesService countriesService,
-		IDiagnosticContext diagnosticContext
+		ICountriesService countriesService
 	)
 	{
 		var count = await countriesService.DeleteCountries(filter);
-		diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-		return new { count };
+		return new MutationResponse(count);
 	}
 }

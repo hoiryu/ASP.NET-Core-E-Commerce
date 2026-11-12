@@ -1,8 +1,9 @@
 using Gridify;
+using PersonManager.Api.Endpoints.Common.Dtos;
+using PersonManager.Api.Endpoints.Common.EndpointFilters;
 using PersonManager.Api.Endpoints.Common.Parameters;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
-using Serilog;
 
 namespace PersonManager.Api.Endpoints.Modules.Identity.Users;
 
@@ -12,10 +13,10 @@ public static class UsersEndpoints
 	{
 		var group = app.MapGroup("/api/users");
 
-		group.MapPost("/", CreateUsers);
+		group.MapPost("/", CreateUsers).AddEndpointFilter<MutationEndpointFilter>();
 		group.MapGet("/", GetUsers);
-		group.MapPatch("/", UpdateUsers);
-		group.MapDelete("/", DeleteUsers);
+		group.MapPatch("/", UpdateUsers).AddEndpointFilter<MutationEndpointFilter>();
+		group.MapDelete("/", DeleteUsers).AddEndpointFilter<MutationEndpointFilter>();
 
 		return group;
 	}
@@ -25,14 +26,10 @@ public static class UsersEndpoints
 	/// </summary>
 	private static async Task<List<UserResponse>> CreateUsers(
 		List<UserCreateRequest> userCreateRequests,
-		IUsersService usersService,
-		IDiagnosticContext diagnosticContext
+		IUsersService usersService
 	)
 	{
-		var users = await usersService.CreateUsers(userCreateRequests);
-		diagnosticContext.Set("AffectedCount", users.Count); // 요청 완료 로그에 생성된 행 수 추가
-
-		return users;
+		return await usersService.CreateUsers(userCreateRequests);
 	}
 
 	private static async Task<Paging<UserResponse>> GetUsers(
@@ -46,31 +43,27 @@ public static class UsersEndpoints
 	/// <summary>
 	/// filter 에 맞는 사용자 일괄 수정 (orderBy·page·pageSize 는 무시)
 	/// </summary>
-	private static async Task<object> UpdateUsers(
+	private static async Task<MutationResponse> UpdateUsers(
 		string? filter,
 		UserUpdateRequest userUpdateRequest,
-		IUsersService usersService,
-		IDiagnosticContext diagnosticContext
+		IUsersService usersService
 	)
 	{
 		var count = await usersService.UpdateUsers(filter, userUpdateRequest);
-		diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-		return new { count };
+		return new MutationResponse(count);
 	}
 
 	/// <summary>
 	/// filter 에 맞는 사용자 일괄 삭제 (orderBy·page·pageSize 는 무시)
 	/// </summary>
-	private static async Task<object> DeleteUsers(
+	private static async Task<MutationResponse> DeleteUsers(
 		string? filter,
-		IUsersService usersService,
-		IDiagnosticContext diagnosticContext
+		IUsersService usersService
 	)
 	{
 		var count = await usersService.DeleteUsers(filter);
-		diagnosticContext.Set("AffectedCount", count); // 요청 완료 로그에 영향받은 행 수 추가
 
-		return new { count };
+		return new MutationResponse(count);
 	}
 }
