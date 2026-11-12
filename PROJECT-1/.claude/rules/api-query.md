@@ -23,7 +23,7 @@ paths:
 
 ## 필드
 
-필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 Repository(`PersonManager.Repositories/Modules/Identity/*/*Repository.cs`)의 `_mapper` 에 등록된 것뿐이다.
+필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 모듈의 매핑 클래스(`PersonManager.Repositories/Modules/Identity/*/*GridifyMapper.cs`)가 `GenerateMappings` 로 자동 등록한 엔티티 public 속성(users 는 `country.id`, `country.name` 포함)에서 `RemoveMap` 으로 뺀 것을 제외한 것이다.
 
 등록되지 않은 필드를 쓰면 `ArgumentException: Field 'xxx' is not mapped` 가 난다.
 

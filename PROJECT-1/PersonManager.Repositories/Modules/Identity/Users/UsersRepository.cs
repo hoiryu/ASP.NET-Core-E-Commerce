@@ -9,22 +9,8 @@ using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
 
 namespace PersonManager.Repositories.Modules.Identity.Users;
 
-public class UsersRepository(AppDbContext _db) : IUsersRepository
+public class UsersRepository(AppDbContext _db, IGridifyMapper<User> _mapper) : IUsersRepository
 {
-	/// <summary>
-	/// 필터·정렬에 허용할 필드 목록 (등록되지 않은 필드는 검증에서 거부)
-	/// </summary>
-	private static readonly IGridifyMapper<User> _mapper = new GridifyMapper<User>()
-		.AddMap("id", temp => temp.Id)
-		.AddMap("name", temp => temp.Name)
-		.AddMap("email", temp => temp.Email)
-		.AddMap("dateOfBirth", temp => temp.DateOfBirth)
-		.AddMap("gender", temp => temp.Gender)
-		.AddMap("address", temp => temp.Address)
-		.AddMap("receiveNewsLetters", temp => temp.ReceiveNewsLetters)
-		.AddMap("country.id", temp => temp.CountryId)
-		.AddMap("country.name", temp => temp.Country!.Name);
-
 	/// <summary>
 	/// SaveChanges 한 번으로 INSERT 를 배치 실행 (트랜잭션 하나라서 하나라도 실패하면 전체 롤백)
 	/// </summary>

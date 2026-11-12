@@ -9,15 +9,8 @@ using PersonManager.RepositoryContracts.Modules.Identity.Countries.Dtos;
 
 namespace PersonManager.Repositories.Modules.Identity.Countries;
 
-public class CountriesRepository(AppDbContext _db) : ICountriesRepository
+public class CountriesRepository(AppDbContext _db, IGridifyMapper<Country> _mapper) : ICountriesRepository
 {
-	/// <summary>
-	/// 필터·정렬에 허용할 필드 목록 (등록되지 않은 필드는 검증에서 거부)
-	/// </summary>
-	private static readonly IGridifyMapper<Country> _mapper = new GridifyMapper<Country>()
-		.AddMap("id", temp => temp.Id)
-		.AddMap("name", temp => temp.Name);
-
 	/// <summary>
 	/// SaveChanges 한 번으로 INSERT 를 배치 실행 (트랜잭션 하나라서 하나라도 실패하면 전체 롤백)
 	/// </summary>

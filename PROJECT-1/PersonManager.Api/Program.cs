@@ -71,6 +71,7 @@ try
 
 	#region Gridify
 	GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer(); // EF Core 에서 필터 값을 SQL 파라미터로 전달
+	builder.Services.AddGridifyMappers(typeof(UsersRepository).Assembly); // GridifyMapper<T> 상속 클래스를 IGridifyMapper<T> 로 등록
 	#endregion
 
 	#region Register DbContext
