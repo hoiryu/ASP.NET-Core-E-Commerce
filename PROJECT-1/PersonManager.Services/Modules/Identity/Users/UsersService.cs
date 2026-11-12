@@ -4,18 +4,17 @@ using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
+using PersonManager.Services.Common.Attributes;
 using PersonManager.Services.Common.Helpers;
 using PersonManager.Services.Modules.Identity.Users.Mappings;
-using SerilogTimings;
 
 namespace PersonManager.Services.Modules.Identity.Users;
 
 public class UsersService(IUsersRepository _usersRepository, ICountriesRepository _countriesRepository) : IUsersService
 {
+	[Timed(nameof(userCreateRequests))]
 	public async Task<List<UserResponse>> CreateUsers(List<UserCreateRequest> userCreateRequests)
 	{
-		using var _ = Operation.Time("Service: {Service:l} Method: {Method:l} Count: {Count}", nameof(UsersService), nameof(CreateUsers), userCreateRequests.Count);
-
 		// 저장 전에 전체를 검증 (하나라도 실패하면 아무것도 저장하지 않음)
 		ValidationHelper.ModelValidation(userCreateRequests);
 
@@ -28,19 +27,17 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return [.. users.Select(user => user.ToResponse())];
 	}
 
+	[Timed(nameof(query))]
 	public async Task<Paging<UserResponse>> GetUsers(GridifyQuery query)
 	{
-		using var _ = Operation.Time("Service: {Service:l} Method: {Method:l} Filter: {Filter}", nameof(UsersService), nameof(GetUsers), query.Filter!);
-
 		Paging<User> users = await _usersRepository.GetUsers(query);
 
 		return new Paging<UserResponse>(users.Count, users.Data.Select(user => user.ToResponse()));
 	}
 
+	[Timed(nameof(filter))]
 	public async Task<int> UpdateUsers(string? filter, UserUpdateRequest userUpdateRequest)
 	{
-		using var _ = Operation.Time("Service: {Service:l} Method: {Method:l} Filter: {Filter}", nameof(UsersService), nameof(UpdateUsers), filter!);
-
 		ValidationHelper.FilterValidation(filter);
 
 		ValidationHelper.ModelValidation(userUpdateRequest);
@@ -51,10 +48,9 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return await _usersRepository.UpdateUsers(filter, userUpdateRequest.ToUpdate());
 	}
 
+	[Timed(nameof(filter))]
 	public async Task<int> DeleteUsers(string? filter)
 	{
-		using var _ = Operation.Time("Service: {Service:l} Method: {Method:l} Filter: {Filter}", nameof(UsersService), nameof(DeleteUsers), filter!);
-
 		ValidationHelper.FilterValidation(filter);
 
 		return await _usersRepository.DeleteUsers(filter);
