@@ -104,8 +104,7 @@ try
 	// 요청당 한 줄: 메서드, 경로+쿼리, 상태 코드, 소요 시간
 	app.UseSerilogRequestLogging(o =>
 	{
-		o.IncludeQueryInRequestPath = true;
-		// 모든 요청 완료 로그에 클라이언트 정보 추가
+		o.IncludeQueryInRequestPath = true; // 모든 요청 완료 로그에 클라이언트 정보 추가
 		o.EnrichDiagnosticContext = (diag, http) =>
 		{
 			diag.Set("ClientIp", http.Connection.RemoteIpAddress?.ToString());
@@ -118,6 +117,17 @@ try
 	// 매칭된 Endpoint 실행
 	app.MapCountriesEndpoints();
 	app.MapUsersEndpoints();
+
+	// 프레임워크 시작 로그(Microsoft.Hosting.Lifetime)는 appsettings 에서 숨기고, 주소·환경만 한 줄로 직접 출력
+	app.Lifetime.ApplicationStarted.Register(() =>
+	{
+		if (app.Logger.IsEnabled(LogLevel.Information))
+			app.Logger.LogInformation(
+				"Now listening on {Addresses} ({EnvName})",
+				string.Join(", ", app.Urls),
+				app.Environment.EnvironmentName
+			);
+	});
 
 	app.Run();
 	return 0;
