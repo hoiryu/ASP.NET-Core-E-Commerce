@@ -6,15 +6,8 @@ using PersonManager.Api.Common.ExceptionHandlers;
 using PersonManager.Api.Endpoints.Modules.Identity.Countries;
 using PersonManager.Api.Endpoints.Modules.Identity.Users;
 using PersonManager.Entities.Data;
-using PersonManager.Repositories.Modules.Identity.Countries;
-using PersonManager.Repositories.Modules.Identity.Users;
-using PersonManager.RepositoryContracts.Modules.Identity.Countries;
-using PersonManager.RepositoryContracts.Modules.Identity.Users;
-using PersonManager.ServiceContracts.Modules.Identity.Countries;
-using PersonManager.ServiceContracts.Modules.Identity.Users;
-using PersonManager.Services.Common.Logging;
-using PersonManager.Services.Modules.Identity.Countries;
-using PersonManager.Services.Modules.Identity.Users;
+using PersonManager.Repositories;
+using PersonManager.Services;
 using Serilog;
 
 // 1단계: 호스트 구성 전에 쓰는 임시 로거 (호스트 구성 중 예외 기록용)
@@ -62,16 +55,12 @@ try
 	// builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
 	#region Register with IoC Container
-	builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
-	builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-	// 로깅 인터셉터([LogExecutionTime] 등)를 거치는 프록시로 감싸서 등록
-	builder.Services.AddLoggedScoped<ICountriesService, CountriesService>();
-	builder.Services.AddLoggedScoped<IUsersService, UsersService>();
+	builder.Services.AddRepositories(); // Repository + Gridify 매퍼
+	builder.Services.AddServices(); // 서비스 (로깅 인터셉터 프록시)
 	#endregion
 
 	#region Gridify
 	GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer(); // EF Core 에서 필터 값을 SQL 파라미터로 전달
-	builder.Services.AddGridifyMappers(typeof(UsersRepository).Assembly); // GridifyMapper<T> 상속 클래스를 IGridifyMapper<T> 로 등록
 	#endregion
 
 	#region Register DbContext
