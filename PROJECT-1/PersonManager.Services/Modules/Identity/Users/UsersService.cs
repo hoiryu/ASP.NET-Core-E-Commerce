@@ -6,7 +6,6 @@ using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
 using PersonManager.Services.Common.Helpers;
 using PersonManager.Services.Common.Logging;
-using PersonManager.Services.Modules.Identity.Users.Mappings;
 
 namespace PersonManager.Services.Modules.Identity.Users;
 

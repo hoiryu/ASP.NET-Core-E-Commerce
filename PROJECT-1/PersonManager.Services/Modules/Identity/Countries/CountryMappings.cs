@@ -2,7 +2,7 @@ using PersonManager.Entities.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries.Dtos;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
 
-namespace PersonManager.Services.Modules.Identity.Countries.Mappings;
+namespace PersonManager.Services.Modules.Identity.Countries;
 
 /// <summary>
 /// Country 관련 DTO ↔ Entity 변환

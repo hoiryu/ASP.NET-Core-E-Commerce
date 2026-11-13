@@ -2,9 +2,9 @@ using PersonManager.Entities.Modules.Identity.Users;
 using PersonManager.RepositoryContracts.Modules.Identity.Users.Dtos;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Enums;
-using PersonManager.Services.Modules.Identity.Countries.Mappings;
+using PersonManager.Services.Modules.Identity.Countries;
 
-namespace PersonManager.Services.Modules.Identity.Users.Mappings;
+namespace PersonManager.Services.Modules.Identity.Users;
 
 /// <summary>
 /// User 관련 DTO ↔ Entity 변환
