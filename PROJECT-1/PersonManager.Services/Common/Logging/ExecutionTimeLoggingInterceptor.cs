@@ -3,19 +3,18 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Castle.DynamicProxy;
 using Gridify;
-using PersonManager.Services.Common.Attributes;
 using SerilogTimings;
 
-namespace PersonManager.Services.Common.Interceptors;
+namespace PersonManager.Services.Common.Logging;
 
 /// <summary>
-/// [Timed] 가 붙은 메서드를 SerilogTimings Operation 으로 감싼다
+/// [LogExecutionTime] 이 붙은 메서드를 SerilogTimings Operation 으로 감싼다
 /// 정상 완료면 completed, 예외로 끝나면 abandoned 로 기록되고 예외는 그대로 전파된다
 /// </summary>
-public sealed class TimingInterceptor : AsyncInterceptorBase
+public sealed class ExecutionTimeLoggingInterceptor : AsyncInterceptorBase
 {
-	// 구현 메서드별 측정 정보 ([Timed] 가 없으면 null)
-	private static readonly ConcurrentDictionary<MethodInfo, TimedMethod?> Cache = new();
+	// 구현 메서드별 측정 정보 ([LogExecutionTime] 이 없으면 null)
+	private static readonly ConcurrentDictionary<MethodInfo, LoggedMethod?> Cache = new();
 
 	protected override async Task InterceptAsync(
 		IInvocation invocation,
@@ -43,19 +42,21 @@ public sealed class TimingInterceptor : AsyncInterceptorBase
 
 	private static Operation? Begin(IInvocation invocation)
 	{
-		// 인터페이스 메서드가 아닌 구현 메서드 기준으로 [Timed] 조회
-		var timed = Cache.GetOrAdd(invocation.MethodInvocationTarget ?? invocation.Method, TimedMethod.Create);
+		// 인터페이스 메서드가 아닌 구현 메서드 기준으로 [LogExecutionTime] 조회
+		var loggedMethod = Cache.GetOrAdd(invocation.MethodInvocationTarget ?? invocation.Method, LoggedMethod.Create);
 
-		return timed is null ? null : Operation.Begin(timed.Template, timed.GetValues(invocation.Arguments));
+		return loggedMethod is null
+			? null
+			: Operation.Begin(loggedMethod.Template, loggedMethod.GetValues(invocation.Arguments));
 	}
 
-	private sealed class TimedMethod(string template, string serviceName, string methodName, int[] parameterIndexes)
+	private sealed class LoggedMethod(string template, string serviceName, string methodName, int[] parameterIndexes)
 	{
 		public string Template { get; } = template;
 
-		public static TimedMethod? Create(MethodInfo method)
+		public static LoggedMethod? Create(MethodInfo method)
 		{
-			var attribute = method.GetCustomAttribute<TimedAttribute>();
+			var attribute = method.GetCustomAttribute<LogExecutionTimeAttribute>();
 			if (attribute is null)
 				return null;
 
@@ -68,7 +69,7 @@ public sealed class TimingInterceptor : AsyncInterceptorBase
 				var parameter =
 					parameters.FirstOrDefault(temp => temp.Name == name)
 					?? throw new InvalidOperationException(
-						$"[Timed] parameter '{name}' not found on {method.DeclaringType?.Name}.{method.Name}"
+						$"[LogExecutionTime] parameter '{name}' not found on {method.DeclaringType?.Name}.{method.Name}"
 					);
 
 				var property = PropertyName(parameter);
@@ -76,7 +77,7 @@ public sealed class TimingInterceptor : AsyncInterceptorBase
 				indexes.Add(parameter.Position);
 			}
 
-			return new TimedMethod(template, method.DeclaringType!.Name, method.Name, [.. indexes]);
+			return new LoggedMethod(template, method.DeclaringType!.Name, method.Name, [.. indexes]);
 		}
 
 		// null 값(빈 filter 등)도 그대로 기록 (SerilogTimings 시그니처가 object[] 라 ! 사용)

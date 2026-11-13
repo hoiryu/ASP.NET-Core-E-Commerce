@@ -3,15 +3,15 @@ using PersonManager.Entities.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Countries.Dtos;
-using PersonManager.Services.Common.Attributes;
 using PersonManager.Services.Common.Helpers;
+using PersonManager.Services.Common.Logging;
 using PersonManager.Services.Modules.Identity.Countries.Mappings;
 
 namespace PersonManager.Services.Modules.Identity.Countries;
 
 public class CountriesService(ICountriesRepository _countriesRepository) : ICountriesService
 {
-	[Timed(nameof(countryCreateRequests))]
+	[LogExecutionTime(nameof(countryCreateRequests))]
 	public async Task<List<CountryResponse>> CreateCountries(List<CountryCreateRequest> countryCreateRequests)
 	{
 		// 저장 전에 전체를 검증 (하나라도 실패하면 아무것도 저장하지 않음)
@@ -37,7 +37,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 		return [.. countries.Select(country => country.ToResponse())];
 	}
 
-	[Timed(nameof(query))]
+	[LogExecutionTime(nameof(query))]
 	public async Task<Paging<CountryResponse>> GetCountries(GridifyQuery query)
 	{
 		Paging<Country> countries = await _countriesRepository.GetCountries(query);
@@ -45,7 +45,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 		return new Paging<CountryResponse>(countries.Count, countries.Data.Select(country => country.ToResponse()));
 	}
 
-	[Timed(nameof(filter))]
+	[LogExecutionTime(nameof(filter))]
 	public async Task<int> UpdateCountries(string? filter, CountryUpdateRequest countryUpdateRequest)
 	{
 		ValidationHelper.FilterValidation(filter);
@@ -55,7 +55,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 		return await _countriesRepository.UpdateCountries(filter, countryUpdateRequest.ToUpdate());
 	}
 
-	[Timed(nameof(filter))]
+	[LogExecutionTime(nameof(filter))]
 	public async Task<int> DeleteCountries(string? filter)
 	{
 		ValidationHelper.FilterValidation(filter);

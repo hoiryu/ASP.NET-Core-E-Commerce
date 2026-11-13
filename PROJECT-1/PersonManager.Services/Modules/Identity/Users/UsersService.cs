@@ -4,15 +4,15 @@ using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users.Dtos;
-using PersonManager.Services.Common.Attributes;
 using PersonManager.Services.Common.Helpers;
+using PersonManager.Services.Common.Logging;
 using PersonManager.Services.Modules.Identity.Users.Mappings;
 
 namespace PersonManager.Services.Modules.Identity.Users;
 
 public class UsersService(IUsersRepository _usersRepository, ICountriesRepository _countriesRepository) : IUsersService
 {
-	[Timed(nameof(userCreateRequests))]
+	[LogExecutionTime(nameof(userCreateRequests))]
 	public async Task<List<UserResponse>> CreateUsers(List<UserCreateRequest> userCreateRequests)
 	{
 		// 저장 전에 전체를 검증 (하나라도 실패하면 아무것도 저장하지 않음)
@@ -27,7 +27,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return [.. users.Select(user => user.ToResponse())];
 	}
 
-	[Timed(nameof(query))]
+	[LogExecutionTime(nameof(query))]
 	public async Task<Paging<UserResponse>> GetUsers(GridifyQuery query)
 	{
 		Paging<User> users = await _usersRepository.GetUsers(query);
@@ -35,7 +35,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return new Paging<UserResponse>(users.Count, users.Data.Select(user => user.ToResponse()));
 	}
 
-	[Timed(nameof(filter))]
+	[LogExecutionTime(nameof(filter))]
 	public async Task<int> UpdateUsers(string? filter, UserUpdateRequest userUpdateRequest)
 	{
 		ValidationHelper.FilterValidation(filter);
@@ -48,7 +48,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		return await _usersRepository.UpdateUsers(filter, userUpdateRequest.ToUpdate());
 	}
 
-	[Timed(nameof(filter))]
+	[LogExecutionTime(nameof(filter))]
 	public async Task<int> DeleteUsers(string? filter)
 	{
 		ValidationHelper.FilterValidation(filter);

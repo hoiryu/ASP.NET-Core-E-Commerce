@@ -12,7 +12,7 @@ using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Countries;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
-using PersonManager.Services.Common.Extensions;
+using PersonManager.Services.Common.Logging;
 using PersonManager.Services.Modules.Identity.Countries;
 using PersonManager.Services.Modules.Identity.Users;
 using Serilog;
@@ -64,9 +64,9 @@ try
 	#region Register with IoC Container
 	builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 	builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-	// [Timed] 메서드 실행 시간을 측정하는 프록시로 감싸서 등록
-	builder.Services.AddTimedScoped<ICountriesService, CountriesService>();
-	builder.Services.AddTimedScoped<IUsersService, UsersService>();
+	// 로깅 인터셉터([LogExecutionTime] 등)를 거치는 프록시로 감싸서 등록
+	builder.Services.AddLoggedScoped<ICountriesService, CountriesService>();
+	builder.Services.AddLoggedScoped<IUsersService, UsersService>();
 	#endregion
 
 	#region Gridify
