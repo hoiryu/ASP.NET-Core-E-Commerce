@@ -51,8 +51,9 @@ try
 	// builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
 	#region Register with IoC Container
-	builder.Services.AddRepositories(builder.Configuration); // DbContext + Repository + Gridify 매퍼
-	builder.Services.AddServices(); // 서비스 (로깅 인터셉터 프록시)
+	builder
+		.Services.AddRepositories(builder.Configuration) // DbContext + Repository + Gridify 매퍼
+		.AddServices(); // 서비스 (로깅 인터셉터 프록시)
 	#endregion
 
 	#region Serilog
