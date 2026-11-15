@@ -1,11 +1,7 @@
 using System.Text.Json.Serialization;
-using Gridify;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using PersonManager.Api.Common.ExceptionHandlers;
 using PersonManager.Api.Endpoints.Modules.Identity.Countries;
 using PersonManager.Api.Endpoints.Modules.Identity.Users;
-using PersonManager.Entities.Data;
 using PersonManager.Repositories;
 using PersonManager.Services;
 using Serilog;
@@ -55,24 +51,8 @@ try
 	// builder.Services.AddAppOptions(builder.Configuration); // Options 패턴 바인딩 + 검증
 
 	#region Register with IoC Container
-	builder.Services.AddRepositories(); // Repository + Gridify 매퍼
+	builder.Services.AddRepositories(builder.Configuration); // DbContext + Repository + Gridify 매퍼
 	builder.Services.AddServices(); // 서비스 (로깅 인터셉터 프록시)
-	#endregion
-
-	#region Gridify
-	GridifyGlobalConfiguration.EnableEntityFrameworkCompatibilityLayer(); // EF Core 에서 필터 값을 SQL 파라미터로 전달
-	#endregion
-
-	#region Register DbContext
-	builder.Services.AddDbContext<AppDbContext>(options =>
-		options
-			.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-			.UseSnakeCaseNamingConvention()
-			// 실패 예외는 위로 전파되어 ExceptionHandler 가 처리·기록하므로 EF 자체 에러 로그는 Debug 로 낮춤
-			.ConfigureWarnings(w =>
-				w.Log((RelationalEventId.CommandError, LogLevel.Debug), (CoreEventId.SaveChangesFailed, LogLevel.Debug))
-			)
-	);
 	#endregion
 
 	#region Serilog
