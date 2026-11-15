@@ -34,9 +34,9 @@ namespace PersonManager.Entities.Migrations
                     email = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: true),
                     date_of_birth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     gender = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
-                    country_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
-                    receive_news_letters = table.Column<bool>(type: "bit", nullable: false)
+                    receive_news_letters = table.Column<bool>(type: "bit", nullable: false),
+                    country_id = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {

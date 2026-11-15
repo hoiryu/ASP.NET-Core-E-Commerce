@@ -12,7 +12,7 @@ using PersonManager.Entities.Data;
 namespace PersonManager.Entities.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261015011017_InitialCreate")]
+    [Migration("20261115082453_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
