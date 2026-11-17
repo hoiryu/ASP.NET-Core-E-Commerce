@@ -16,19 +16,7 @@ public class CountriesService(ICountriesRepository _countriesRepository) : ICoun
 		// 저장 전에 전체를 검증 (하나라도 실패하면 아무것도 저장하지 않음)
 		ValidationHelper.ModelValidation(countryCreateRequests);
 
-		List<string> names = [.. countryCreateRequests.Select(temp => temp.Name!)];
-
-		// DB collation 과 같게 대소문자를 무시하고 요청 안의 중복 확인
-		if (names.Distinct(StringComparer.OrdinalIgnoreCase).Count() != names.Count)
-		{
-			throw new ArgumentException("Duplicate country names in request");
-		}
-
-		if (await _countriesRepository.ExistsAnyCountryByNames(names))
-		{
-			throw new ArgumentException("Given country name already exists");
-		}
-
+		// 이름 중복(요청 안, DB 에 이미 있는 값)은 유니크 인덱스가 막아 전체 롤백 (UniqueConstraintException → 409)
 		List<Country> countries = await _countriesRepository.CreateCountries([
 			.. countryCreateRequests.Select(temp => temp.ToEntity()),
 		]);

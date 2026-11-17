@@ -14,8 +14,6 @@ public interface ICountriesRepository
 
 	Task<bool> ExistsCountriesByIds(List<Guid> countryIds);
 
-	Task<bool> ExistsAnyCountryByNames(List<string> names);
-
 	Task<int> UpdateCountries(string filter, CountryUpdate values);
 
 	Task<int> DeleteCountries(string filter);

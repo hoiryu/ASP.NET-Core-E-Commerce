@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../PersonManager.Entities/PersonManager.Entities.csproj" />
+    <ProjectReference Include="../PersonManager.Exceptions/PersonManager.Exceptions.csproj" />
     <ProjectReference Include="../PersonManager.RepositoryContracts/PersonManager.RepositoryContracts.csproj" />
     <ProjectReference Include="../PersonManager.ServiceContracts/PersonManager.ServiceContracts.csproj" />
   </ItemGroup>

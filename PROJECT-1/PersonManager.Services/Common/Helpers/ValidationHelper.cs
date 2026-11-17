@@ -1,13 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using PersonManager.Exceptions;
 
 namespace PersonManager.Services.Common.Helpers;
 
 public static class ValidationHelper
 {
-	internal static void ModelValidation(object obj)
+	internal static void ModelValidation(object? obj)
 	{
-		ArgumentNullException.ThrowIfNull(obj);
+		// 배열 안의 null 항목 등
+		if (obj is null)
+			throw new InvalidRequestException("Request body is required");
 
 		ValidationContext validationContext = new(obj);
 
@@ -21,16 +24,14 @@ public static class ValidationHelper
 		);
 
 		if (!isValid)
-			throw new ArgumentException(validationResults.FirstOrDefault()?.ErrorMessage);
+			throw new InvalidRequestException(validationResults.FirstOrDefault()?.ErrorMessage ?? "Invalid request");
 	}
 
-	internal static void ModelValidation<T>(IEnumerable<T> objs)
+	internal static void ModelValidation<T>(IEnumerable<T>? objs)
 		where T : notnull
 	{
-		ArgumentNullException.ThrowIfNull(objs);
-
-		if (!objs.Any())
-			throw new ArgumentException($"At least one {typeof(T).Name} is required");
+		if (objs is null || !objs.Any())
+			throw new InvalidRequestException($"At least one {typeof(T).Name} is required");
 
 		foreach (T obj in objs)
 			ModelValidation(obj);
@@ -40,6 +41,6 @@ public static class ValidationHelper
 	internal static void FilterValidation([NotNull] string? filter)
 	{
 		if (string.IsNullOrWhiteSpace(filter))
-			throw new ArgumentException("Filter is required");
+			throw new InvalidRequestException("Filter is required");
 	}
 }

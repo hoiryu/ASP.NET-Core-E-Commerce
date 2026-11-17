@@ -40,7 +40,7 @@ try
 	#region Exception Handling
 	// 오류 응답을 ProblemDetails(RFC 9457) 형식으로 통일
 	builder.Services.AddProblemDetails();
-	// ArgumentException → 400, 유니크 인덱스 위반 → 409 (그 외 예외는 500)
+	// InvalidRequestException·DB 값 오류 → 400, DB 제약 위반 → 409 (그 외 예외는 500)
 	builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 	#endregion
 

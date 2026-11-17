@@ -1,6 +1,6 @@
+using EntityFramework.Exceptions.Common;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using PersonManager.Exceptions;
 
 namespace PersonManager.Api.Common.ExceptionHandlers;
 
@@ -10,10 +10,6 @@ namespace PersonManager.Api.Common.ExceptionHandlers;
 /// </summary>
 public sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {
-	// SQL Server 오류 번호
-	private const int UniqueIndexViolation = 2601; // 유니크 인덱스 중복 (HasIndex().IsUnique())
-	private const int UniqueConstraintViolation = 2627; // PK·UNIQUE 제약 중복
-
 	public async ValueTask<bool> TryHandleAsync(
 		HttpContext httpContext,
 		Exception exception,
@@ -23,22 +19,18 @@ public sealed class ApiExceptionHandler(IProblemDetailsService problemDetailsSer
 		// title 은 지정하지 않아 상태 코드 이름(Bad Request, Conflict)으로 자동 설정된다 (RFC 9457)
 		(int statusCode, string detail)? error = exception switch
 		{
-			// 서비스 검증(빈 배열, 빈 filter, 중복 등)과 Gridify 파싱 오류
-			ArgumentException => (StatusCodes.Status400BadRequest, exception.Message),
+			// 서비스 검증(빈 배열, 빈 filter, 없는 country id 등)과 Gridify 필드·문법 오류
+			InvalidRequestException => (StatusCodes.Status400BadRequest, exception.Message),
 
 			// 요청 바인딩 실패 (빈 body, 잘못된 JSON 등). Development 에서만 예외로 던져지고, 그 외 환경은 예외 없이 400
 			BadHttpRequestException badRequest => (badRequest.StatusCode, exception.Message),
 
-			// 유니크 인덱스 위반 (메시지에 SQL 정보가 있어 detail 은 고정 문구)
-			// SaveChanges 는 DbUpdateException 으로 감싸고, ExecuteUpdate/Delete 는 SqlException 을 그대로 던진다
-			DbUpdateException
-			{
-				InnerException: SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation }
-			}
-			or SqlException { Number: UniqueIndexViolation or UniqueConstraintViolation } => (
-				StatusCodes.Status409Conflict,
-				"The request conflicts with existing data."
-			),
+			// DB 제약 위반 (UseExceptionProcessor 가 변환. 원본 메시지에 SQL 정보가 있어 detail 은 고정 문구)
+			UniqueConstraintException => (StatusCodes.Status409Conflict, "The request conflicts with existing data."),
+			ReferenceConstraintException => (StatusCodes.Status409Conflict, "The request conflicts with related data."),
+			CannotInsertNullException => (StatusCodes.Status400BadRequest, "A required value is missing."),
+			MaxLengthExceededException => (StatusCodes.Status400BadRequest, "A value exceeds the maximum length."),
+			NumericOverflowException => (StatusCodes.Status400BadRequest, "A numeric value is out of range."),
 			_ => null,
 		};
 

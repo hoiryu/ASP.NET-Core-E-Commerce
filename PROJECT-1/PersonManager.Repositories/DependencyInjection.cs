@@ -1,3 +1,4 @@
+using EntityFramework.Exceptions.SqlServer;
 using Gridify;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -27,6 +28,8 @@ public static class DependencyInjection
 			options
 				.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
 				.UseSnakeCaseNamingConvention()
+				// DB 오류를 타입 예외로 변환 (유니크 위반 → UniqueConstraintException 등). SaveChanges, ExecuteUpdate/Delete 모두 적용
+				.UseExceptionProcessor()
 				// 실패 예외는 위로 전파되어 ExceptionHandler 가 처리·기록하므로 EF 자체 에러 로그는 Debug 로 낮춤
 				.ConfigureWarnings(w =>
 					w.Log((RelationalEventId.CommandError, LogLevel.Debug), (CoreEventId.SaveChangesFailed, LogLevel.Debug))

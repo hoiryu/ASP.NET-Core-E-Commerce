@@ -48,15 +48,6 @@ public class CountriesRepository(AppDbContext _db, IGridifyMapper<Country> _mapp
 	}
 
 	/// <summary>
-	/// 이름 중 하나라도 존재하는지 EXISTS 쿼리 한 번으로 확인
-	/// 대소문자 구분은 DB collation 을 따름 (기본 *_CI_AS 는 구분하지 않음)
-	/// </summary>
-	public async Task<bool> ExistsAnyCountryByNames(List<string> names)
-	{
-		return await _db.Countries.AnyAsync(temp => names.Contains(temp.Name!));
-	}
-
-	/// <summary>
 	/// filter 에 맞는 행을 엔티티 로드 없이 UPDATE 한 번으로 수정하고 영향받은 행 수 반환
 	/// </summary>
 	public async Task<int> UpdateCountries(string filter, CountryUpdate values)

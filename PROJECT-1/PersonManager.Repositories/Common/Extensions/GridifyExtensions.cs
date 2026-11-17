@@ -1,16 +1,17 @@
 using Gridify;
+using PersonManager.Exceptions;
 
 namespace PersonManager.Repositories.Common.Extensions;
 
 internal static class GridifyExtensions
 {
 	/// <summary>
-	/// mapper 에 없는 필드·잘못된 문법이면 ArgumentException
+	/// mapper 에 없는 필드·잘못된 문법이면 InvalidRequestException
 	/// </summary>
 	public static void EnsureValid<T>(this IGridifyQuery query, IGridifyMapper<T> mapper)
 	{
 		if (!query.IsValid(out var errors, mapper))
-			throw new ArgumentException(string.Join(", ", errors));
+			throw new InvalidRequestException(string.Join(", ", errors));
 	}
 
 	/// <summary>
@@ -28,7 +29,7 @@ internal static class GridifyExtensions
 	public static IQueryable<T> ApplyBulkFiltering<T>(this IQueryable<T> source, string filter, IGridifyMapper<T> mapper)
 	{
 		if (string.IsNullOrWhiteSpace(filter))
-			throw new ArgumentException("Filter is required for bulk operations");
+			throw new InvalidRequestException("Filter is required for bulk operations");
 
 		new GridifyQuery { Filter = filter }.EnsureValid(mapper);
 

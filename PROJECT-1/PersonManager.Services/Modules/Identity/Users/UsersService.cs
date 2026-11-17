@@ -1,5 +1,6 @@
 using Gridify;
 using PersonManager.Entities.Modules.Identity.Users;
+using PersonManager.Exceptions;
 using PersonManager.RepositoryContracts.Modules.Identity.Countries;
 using PersonManager.RepositoryContracts.Modules.Identity.Users;
 using PersonManager.ServiceContracts.Modules.Identity.Users;
@@ -19,7 +20,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 
 		List<Guid> countryIds = [.. userCreateRequests.Select(temp => temp.Country?.Id).OfType<Guid>().Distinct()];
 		if (countryIds.Count > 0 && !await _countriesRepository.ExistsCountriesByIds(countryIds))
-			throw new ArgumentException("Given country id doesn't exist");
+			throw new InvalidRequestException("Given country id doesn't exist");
 
 		List<User> users = await _usersRepository.CreateUsers([.. userCreateRequests.Select(temp => temp.ToEntity())]);
 
@@ -42,7 +43,7 @@ public class UsersService(IUsersRepository _usersRepository, ICountriesRepositor
 		ValidationHelper.ModelValidation(userUpdateRequest);
 
 		if (userUpdateRequest.Country?.Id is Guid countryId && !await _countriesRepository.ExistsCountryById(countryId))
-			throw new ArgumentException("Given country id doesn't exist");
+			throw new InvalidRequestException("Given country id doesn't exist");
 
 		return await _usersRepository.UpdateUsers(filter, userUpdateRequest.ToUpdate());
 	}
