@@ -10,7 +10,7 @@ public class UserUpdateRequest
 	public string? Name { get; set; }
 
 	[MinLength(1, ErrorMessage = "[Users] Email can't be blank")]
-	[EmailAddress(ErrorMessage = "[Users] Email value should be a vaild email")]
+	[EmailAddress(ErrorMessage = "[Users] Email value should be a valid email")]
 	public string? Email { get; set; }
 	public DateTime? DateOfBirth { get; set; }
 
