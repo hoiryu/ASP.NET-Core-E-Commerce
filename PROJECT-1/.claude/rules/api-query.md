@@ -25,7 +25,7 @@ paths:
 
 필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 모듈의 매핑 클래스(`PersonManager.Repositories/Modules/Identity/*/*GridifyMapper.cs`)가 `GenerateMappings` 로 자동 등록한 엔티티 public 속성(users 는 `country.id`, `country.name` 포함)에서 `RemoveMap` 으로 뺀 것을 제외한 것이다.
 
-등록되지 않은 필드를 쓰면 `ArgumentException: Field 'xxx' is not mapped` 가 난다.
+등록되지 않은 필드를 쓰면 `InvalidRequestException: Field 'xxx' is not mapped` (400) 가 난다.
 
 ## 연산자
 
@@ -118,10 +118,10 @@ POST /api/users       body: UserCreateRequest[]
 POST /api/countries   body: CountryCreateRequest[]
 ```
 
-- 빈 배열이면 `ValidationHelper.ModelValidation` 에서 `ArgumentException` 으로 거부
+- 빈 배열이면 `ValidationHelper.ModelValidation` 에서 `InvalidRequestException` 으로 거부
 - 저장 전에 전체를 검증하고 `AddRange` + `SaveChanges` 한 번으로 INSERT 한다. 트랜잭션 하나라서 하나라도 실패하면 전체 롤백
 - users: `country.id` 는 쿼리 한 번으로 존재 여부를 확인
-- countries: 요청 안의 이름 중복(대소문자 무시)과 DB 에 이미 있는 이름을 거부
+- countries: 요청 안의 이름 중복(대소문자 무시)과 DB 에 이미 있는 이름은 유니크 인덱스가 막아 전체 롤백하고 409 를 반환
 
 ```
 POST /api/countries   [{"name": "Korea"}, {"name": "Japan"}]
@@ -138,7 +138,7 @@ PATCH  /api/countries?filter=<조건>   body: CountryUpdateRequest
 DELETE /api/countries?filter=<조건>   (참조하는 User 의 country 는 null 로 변경)
 ```
 
-- `filter` 가 비면 서비스에서 `ArgumentException` 으로 거부 (전체 행 수정·삭제 방지)
+- `filter` 가 비면 서비스에서 `InvalidRequestException` 으로 거부 (전체 행 수정·삭제 방지)
 - `email` 을 바꿀 때 대상이 여러 행이거나 이미 있는 값이면 유니크 인덱스 위반으로 UPDATE 전체가 실패하고 409 를 반환한다
 - `ExecuteUpdateAsync`/`ExecuteDeleteAsync` 로 SQL 한 번에 실행하며 `SaveChanges` 를 거치지 않는다
 
