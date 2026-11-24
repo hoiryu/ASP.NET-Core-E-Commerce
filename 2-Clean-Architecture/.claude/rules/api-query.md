@@ -23,7 +23,7 @@ paths:
 
 ## 필드
 
-필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 모듈의 매핑 클래스(`PersonManager.Repositories/Modules/Identity/*/*GridifyMapper.cs`)가 `GenerateMappings` 로 자동 등록한 엔티티 public 속성(users 는 `country.id`, `country.name` 포함)에서 `RemoveMap` 으로 뺀 것을 제외한 것이다.
+필드 이름은 대소문자를 구분하지 않는다. 허용 필드는 각 모듈의 매핑 클래스(`PersonManager.Infrastructure/Modules/Identity/*/*GridifyMapper.cs`)가 `GenerateMappings` 로 자동 등록한 엔티티 public 속성(users 는 `country.id`, `country.name` 포함)에서 `RemoveMap` 으로 뺀 것을 제외한 것이다.
 
 등록되지 않은 필드를 쓰면 `InvalidRequestException: Field 'xxx' is not mapped` (400) 가 난다.
 
@@ -74,7 +74,7 @@ orderBy=name desc                   내림차순
 orderBy=country.name, name desc     여러 개는 쉼표로, 앞쪽이 우선
 ```
 
-`orderBy` 를 생략하면 `id` 오름차순으로 정렬한다. ORDER BY 없는 페이징은 순서가 보장되지 않기 때문이다(`GridifyExtensions.EnsureOrdering`).
+`orderBy` 를 생략하면 `id` 오름차순으로 정렬한다. ORDER BY 없는 페이징은 순서가 보장되지 않기 때문이다(`PersonManager.Infrastructure` 의 `GridifyExtensions.ToGridifyQuery`).
 
 ## 특수문자 이스케이프
 
@@ -118,10 +118,10 @@ POST /api/users       body: UserCreateRequest[]
 POST /api/countries   body: CountryCreateRequest[]
 ```
 
-- 빈 배열이면 `ValidationHelper.ModelValidation` 에서 `InvalidRequestException` 으로 거부
+- 빈 배열이면 Core 의 `ValidationHelper.ModelValidation` 에서 `InvalidRequestException` 으로 거부
 - 저장 전에 전체를 검증하고 `AddRange` + `SaveChanges` 한 번으로 INSERT 한다. 트랜잭션 하나라서 하나라도 실패하면 전체 롤백
 - users: `country.id` 는 쿼리 한 번으로 존재 여부를 확인
-- countries: 요청 안의 이름 중복(대소문자 무시)과 DB 에 이미 있는 이름은 유니크 인덱스가 막아 전체 롤백하고 409 를 반환
+- countries: 요청 안의 이름 중복(대소문자 무시)과 DB 에 이미 있는 이름은 유니크 인덱스가 막아 전체 롤백하고 409 를 반환 (Infrastructure 가 `ConflictException` 으로 변환)
 
 ```
 POST /api/countries   [{"name": "Korea"}, {"name": "Japan"}]

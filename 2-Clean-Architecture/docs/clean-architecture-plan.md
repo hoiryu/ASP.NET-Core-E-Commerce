@@ -1,6 +1,6 @@
 # Clean Architecture 전환 계획
 
-> 상태: **계획** (2026-11-22 작성, 2026-11-24 전체 검토). 아직 적용한 것 없음.
+> 상태: **적용 완료** (2026-11-22 작성, 2026-11-24 전체 검토·적용).
 > 범위: 프로젝트 구조·참조 방향을 Clean Architecture 표준으로 바꾸고, 계층 규칙에 어긋나는 로직(Gridify·Serilog 의존, 변환 로직 중복 등)을 정리한다.
 > 유지: API 계약(URL, 쿼리스트링, JSON 모양, 상태 코드)과 DB 스키마.
 > 범위 밖: DDD 작업(팩토리, private setter, Value Object, Domain Event).
