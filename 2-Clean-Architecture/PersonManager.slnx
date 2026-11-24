@@ -1,9 +1,6 @@
 <Solution>
-  <Project Path="PersonManager.Entities/PersonManager.Entities.csproj" />
-  <Project Path="PersonManager.Api/PersonManager.Api.csproj" />
-  <Project Path="PersonManager.Exceptions/PersonManager.Exceptions.csproj" />
-  <Project Path="PersonManager.Repositories/PersonManager.Repositories.csproj" />
-  <Project Path="PersonManager.RepositoryContracts/PersonManager.RepositoryContracts.csproj" />
-  <Project Path="PersonManager.ServiceContracts/PersonManager.ServiceContracts.csproj" />
-  <Project Path="PersonManager.Services/PersonManager.Services.csproj" />
+	<Project Path="PersonManager.Domain/PersonManager.Domain.csproj" />
+	<Project Path="PersonManager.Core/PersonManager.Core.csproj" />
+	<Project Path="PersonManager.Infrastructure/PersonManager.Infrastructure.csproj" />
+	<Project Path="PersonManager.Presentation/PersonManager.Presentation.csproj" />
 </Solution>
