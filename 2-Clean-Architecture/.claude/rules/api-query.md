@@ -1,7 +1,6 @@
 ---
 paths:
   - "PersonManager.*/**"
-  - "docs/**"
 ---
 
 # API 목록 조회 쿼리스트링 (Gridify)
